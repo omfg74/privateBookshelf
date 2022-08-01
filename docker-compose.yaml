@@ -1,0 +1,21 @@
+version: '3'
+services:
+  postgres:
+    image: postgres:14
+    restart: always
+    command:
+      - '-c'
+      - 'shared_buffers=256MB'
+      - '-c'
+      - 'max_connections=200'
+    environment:
+      POSTGRES_DB: book_shelf
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+    volumes:
+      - postgresql_data:/var/lib/postgresql/data
+    ports:
+      - 5433:5432
+
+volumes:
+  postgresql_data:
