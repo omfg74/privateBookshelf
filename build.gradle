@@ -1,8 +1,10 @@
 plugins {
-	id 'org.springframework.boot' version '2.7.2'
+	id 'org.springframework.boot' version '2.5.4'
 	id 'io.spring.dependency-management' version '1.0.12.RELEASE'
 	id 'com.vaadin' version '23.1.2'
 	id 'java'
+	id 'groovy'
+
 }
 
 group = 'com.omfgdevelop'
@@ -34,14 +36,17 @@ dependencies {
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'org.postgresql:postgresql'
 	annotationProcessor 'org.projectlombok:lombok'
+
+
+
+
+//TEST
+	testImplementation 'org.spockframework:spock-core:2.1-groovy-3.0'
+	testImplementation 'org.spockframework:spock-spring:2.1-groovy-3.0'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
 	testImplementation 'org.testcontainers:junit-jupiter'
 	testImplementation 'org.testcontainers:postgresql'
-
-
-
-
 
 
 }
