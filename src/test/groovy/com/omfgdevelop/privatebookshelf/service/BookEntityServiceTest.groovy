@@ -1,12 +1,15 @@
 package com.omfgdevelop.privatebookshelf.service
 
 import com.omfgdevelop.privatebookshelf.RepositorySpecBase
+import com.omfgdevelop.privatebookshelf.domain.BookFilter
 import com.omfgdevelop.privatebookshelf.entity.AuthorEntity
 import com.omfgdevelop.privatebookshelf.entity.BookEntity
 import com.omfgdevelop.privatebookshelf.entity.BookFile
 import com.omfgdevelop.privatebookshelf.entity.GenreEntity
 import com.omfgdevelop.privatebookshelf.exception.BusinessException
+import com.omfgdevelop.privatebookshelf.utils.FilteredQueryWithPagingRequest
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.domain.Page
 
 import javax.transaction.Transactional
 
@@ -126,6 +129,32 @@ class BookEntityServiceTest extends RepositorySpecBase {
 
         then:
         thrown BusinessException
+    }
+
+    @Transactional
+    def 'can find page of books'() {
+        given:
+
+        def filter = BookFilter.builder()
+                .text("Tom").build()
+        def request = FilteredQueryWithPagingRequest<BookFilter>.builder()
+                .filter(filter)
+                .pageNumber(10)
+                .pageNumber(0)
+                .build()
+
+        when:
+        Page page = bookService.getBookPage(request);
+
+
+        then:
+
+        page != null
+
+        page.getTotalElements() == 1
+        page.getContent().stream().toList().get(0).getAuthor().stream().toList().get(0).getId() == 10
+        page.getContent().get(0).getName() == "Tom Soyer"
+        page.getContent().get(0).getId()== 101
     }
 
 

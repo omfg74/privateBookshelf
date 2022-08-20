@@ -1,9 +1,11 @@
 package com.omfgdevelop.privatebookshelf.entity;
 
 import lombok.*;
+import lombok.experimental.FieldNameConstants;
 import lombok.experimental.SuperBuilder;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.List;
 import java.util.Set;
 
@@ -14,7 +16,8 @@ import java.util.Set;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class BookEntity {
+@FieldNameConstants
+public class BookEntity implements Serializable {
 
     @Id
     @Column(name = "id")
@@ -42,7 +45,7 @@ public class BookEntity {
     @Column(name = "outlet")
     private String outlet;
 
-    @OneToMany
+    @OneToMany(fetch = FetchType.EAGER)
     @JoinColumn(name = "book_id")
     private List<BookFile> files;
 }
