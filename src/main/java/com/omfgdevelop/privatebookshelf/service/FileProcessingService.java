@@ -34,6 +34,17 @@ public class FileProcessingService {
         while ((bytesRead = inputStream.read(buffer)) != -1) {
             outStream.write(buffer, 0, bytesRead);
         }
+        if (mimeType.equals("application/octet-stream")) {
+            if (filename.contains("fb2")) {
+                mimeType = "fb2";
+            } else if (filename.contains("epub")) {
+                mimeType = "epub";
+            } else if (filename.contains("pdf")) {
+                mimeType = "pdf";
+            } else {
+                mimeType = "txt";
+            }
+        }
 
         var bookFile = BookFileEntity.builder()
                 .name(name)
