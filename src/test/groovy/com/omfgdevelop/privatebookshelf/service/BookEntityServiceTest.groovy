@@ -4,7 +4,7 @@ import com.omfgdevelop.privatebookshelf.RepositorySpecBase
 import com.omfgdevelop.privatebookshelf.domain.BookFilter
 import com.omfgdevelop.privatebookshelf.entity.AuthorEntity
 import com.omfgdevelop.privatebookshelf.entity.BookEntity
-import com.omfgdevelop.privatebookshelf.entity.BookFile
+import com.omfgdevelop.privatebookshelf.entity.BookFileEntity
 import com.omfgdevelop.privatebookshelf.entity.GenreEntity
 import com.omfgdevelop.privatebookshelf.exception.BusinessException
 import com.omfgdevelop.privatebookshelf.utils.FilteredQueryWithPagingRequest
@@ -40,7 +40,7 @@ class BookEntityServiceTest extends RepositorySpecBase {
                 .name("Tom Soyer")
                 .outlet("Питер")
                 .files(new ArrayList<>(Collections.singletonList(
-                        BookFile.builder().id(10L)
+                        BookFileEntity.builder().id(10L)
                                 .build())))
                 .genres(new HashSet<>(Collections.singletonList(GenreEntity.builder().name("Fiction").build())))
                 .author(new HashSet<>(Collections.singletonList(AuthorEntity
@@ -94,7 +94,7 @@ class BookEntityServiceTest extends RepositorySpecBase {
                 .name("Tom Soyer")
                 .outlet("Питер")
                 .files(new ArrayList<>(Collections.singletonList(
-                        BookFile.builder().id(10L)
+                        BookFileEntity.builder().id(10L)
                                 .build())))
                 .genres(new HashSet<>(Collections.singletonList(GenreEntity.builder().name("Fiction").build())))
                 .build()
@@ -115,7 +115,7 @@ class BookEntityServiceTest extends RepositorySpecBase {
                 .name("Tom Soyer")
                 .outlet("Питер")
                 .files(new ArrayList<>(Collections.singletonList(
-                        BookFile.builder().id(10L)
+                        BookFileEntity.builder().id(10L)
                                 .build())))
                 .author(new HashSet<>(Collections.singletonList(AuthorEntity
                         .builder()

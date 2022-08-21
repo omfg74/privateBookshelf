@@ -1,14 +1,15 @@
 package com.omfgdevelop.privatebookshelf.service;
 
 import com.omfgdevelop.privatebookshelf.domain.Book;
+import com.omfgdevelop.privatebookshelf.domain.BookFile;
 import com.omfgdevelop.privatebookshelf.domain.BookFilter;
 import com.omfgdevelop.privatebookshelf.entity.AuthorEntity;
 import com.omfgdevelop.privatebookshelf.entity.BookEntity;
-import com.omfgdevelop.privatebookshelf.entity.BookFile;
+import com.omfgdevelop.privatebookshelf.entity.BookFileEntity;
 import com.omfgdevelop.privatebookshelf.entity.GenreEntity;
 import com.omfgdevelop.privatebookshelf.exception.BusinessError;
 import com.omfgdevelop.privatebookshelf.exception.BusinessException;
-import com.omfgdevelop.privatebookshelf.mapper.Mapper;
+import com.omfgdevelop.privatebookshelf.mapper.UberMapper;
 import com.omfgdevelop.privatebookshelf.repository.BookRepository;
 import com.omfgdevelop.privatebookshelf.utils.Domain;
 import com.omfgdevelop.privatebookshelf.utils.FilteredQueryWithPagingRequest;
@@ -19,6 +20,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -31,7 +33,9 @@ public class BookService {
 
     private final EntityManager entityManager;
 
-    private final Mapper mapper;
+    private final UberMapper mapper;
+
+    private final BookFileService bookFileServise;
 
     private final static int MAX_PAGE_SIZE = 20;
 
@@ -39,7 +43,8 @@ public class BookService {
         return bookRepository.findById(id).orElseThrow();
     }
 
-    public BookEntity create(BookEntity book) throws BusinessException {
+    @Transactional
+    public Book create(Book book) throws BusinessException {
         if (book.getAuthor() != null && !book.getAuthor().isEmpty()) {
             book.getAuthor().forEach(authorEntity -> {
                 if (authorEntity.getId() != null) {
@@ -64,18 +69,21 @@ public class BookService {
         if (book.getFiles() == null) {
             throw new BusinessException(BusinessError.NO_FILES_SET_TO_BOOK);
         }
-        if (book.getFiles().stream().map(BookFile::getId).filter(Objects::isNull).toList().size() > 0) {
+        if (book.getFiles().stream().map(BookFile::getId).filter(Objects::nonNull).toList().size() > 0) {
             throw new BusinessException(BusinessError.WRONG_FILE_PAREMS_SET);
         }
+        book.getFiles().addAll(bookFileServise.findAllByBookId(book.getId()));
 
-        book.getFiles().forEach(bookFile -> {
-            var entity = entityManager.getReference(BookFile.class, bookFile.getId());
-            bookFile.setId(entity.getId());
-            bookFile.setName(entity.getName());
-            bookFile.setFileExtension(entity.getFileExtension());
-        });
+//        book.getFiles().forEach(bookFile -> {
+//            if (bookFile.getId() != null) {
+//                var entity = entityManager.getReference(BookFileEntity.class, bookFile.getId());
+//                bookFile.setId(entity.getId());
+//                bookFile.setName(entity.getName());
+//                bookFile.setFileExtension(entity.getFileExtension());
+//            }
+//        });
 
-        return bookRepository.save(book);
+        return mapper.map(bookRepository.saveAndFlush(mapper.map(book)));
     }
 
 
@@ -94,7 +102,7 @@ public class BookService {
 
     public Page<Book> getBookPage(FilteredQueryWithPagingRequest<BookFilter> request) {
 
-        Page<Book> page= SearchProcessor.findPage(request,
+        Page<Book> page = SearchProcessor.findPage(request,
                 bookRepository,
                 this::getWhereClose,
                 this::pageProcessor,

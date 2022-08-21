@@ -5,6 +5,7 @@ import com.omfgdevelop.privatebookshelf.entity.BookEntity;
 import lombok.*;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Set;
 
 @Getter
@@ -12,7 +13,7 @@ import java.util.Set;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Genre {
+public class Genre implements Serializable {
 
     private Long id;
 

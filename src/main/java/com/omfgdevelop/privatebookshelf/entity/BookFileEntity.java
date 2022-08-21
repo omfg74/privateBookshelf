@@ -4,6 +4,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 
 @Entity
 @Table(name = "file")
@@ -12,7 +13,7 @@ import javax.validation.constraints.NotNull;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class BookFile {
+public class BookFileEntity implements Serializable {
 
     @Id
     @Column(name = "id", nullable = false)
@@ -26,5 +27,7 @@ public class BookFile {
     @Column(name = "file_extension")
     private String fileExtension;
 
+    @Column(name = "book_id")
+    private Long bookId;
 
 }

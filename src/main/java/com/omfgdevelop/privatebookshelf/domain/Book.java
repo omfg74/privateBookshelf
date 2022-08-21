@@ -1,7 +1,6 @@
 package com.omfgdevelop.privatebookshelf.domain;
 
-import com.omfgdevelop.privatebookshelf.entity.BookFile;
-import com.omfgdevelop.privatebookshelf.entity.GenreEntity;
+import com.omfgdevelop.privatebookshelf.entity.BookFileEntity;
 import lombok.*;
 
 import java.util.List;

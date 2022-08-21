@@ -45,7 +45,7 @@ public class BookEntity implements Serializable {
     @Column(name = "outlet")
     private String outlet;
 
-    @OneToMany(fetch = FetchType.EAGER)
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "book_id")
-    private List<BookFile> files;
+    private List<BookFileEntity> files;
 }
