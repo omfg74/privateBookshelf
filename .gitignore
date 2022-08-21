@@ -39,3 +39,4 @@ out/
 /package.json
 /webpack.config.js
 /webpack.generated.js
+/src/main/resources/tmp/
