@@ -29,7 +29,7 @@ public class FileProcessingService {
         File targetFile = new File(path + "/" + name);
         OutputStream outStream = new FileOutputStream(targetFile);
 
-        byte[] buffer = new byte[contentLength * 1024];
+        byte[] buffer = new byte[contentLength];
         int bytesRead;
         while ((bytesRead = inputStream.read(buffer)) != -1) {
             outStream.write(buffer, 0, bytesRead);

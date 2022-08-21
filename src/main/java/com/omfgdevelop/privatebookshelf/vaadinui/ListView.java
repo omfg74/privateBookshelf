@@ -90,77 +90,11 @@ public class ListView extends VerticalLayout {
     private Button createUploadButton() {
         var uploadBtn = new Button("Upload");
         uploadBtn.addClickListener(new ComponentEventListener<ClickEvent<Button>>() {
+
             @Override
             public void onComponentEvent(ClickEvent<Button> event) {
-                MemoryBuffer memoryBuffer = new MemoryBuffer();
-                Upload singleFileUpload = new Upload(memoryBuffer);
-                Dialog dialog = new Dialog();
-                dialog.setHeaderTitle("Upload book");
-                singleFileUpload.setAcceptedFileTypes("application/pdf", ".pdf", "application/epub+zip", ".epub", "application/fb2", ".fb2");
-
-                TextField bookName = new TextField();
-                bookName.setPlaceholder("New book name");
-                ComboBox<Author> authorsComboBox = new ComboBox<>();
-                authorsComboBox.setItems(authorService.findAll());
-                authorsComboBox.setItemLabelGenerator(it -> it.getLastName() + " " + it.getFirstName());
-
-                ComboBox<Genre> genreComboBox = new ComboBox<>();
-                genreComboBox.setItems(genreService.findAll());
-                genreComboBox.setItemLabelGenerator(Genre::getName);
-
-                Button closeButton = new Button(new Icon("lumo", "cross"), (e) -> dialog.close());
-                closeButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
-                Button okBtn = new Button("OK");
-                dialog.getHeader().add(closeButton);
-                dialog.add(singleFileUpload);
-                dialog.add(bookName);
-                dialog.add(authorsComboBox);
-                dialog.add(genreComboBox);
-                dialog.getFooter().add(okBtn);
-
-                singleFileUpload.addSucceededListener(uploadEvent -> {
-                    // Get information about the uploaded file
-                    final InputStream fileData = memoryBuffer.getInputStream();
-                    final String fileName = uploadEvent.getFileName();
-                    final long contentLength = uploadEvent.getContentLength();
-                    final String mimeType = uploadEvent.getMIMEType();
-
-
-                    okBtn.addClickListener((ComponentEventListener<ClickEvent<Button>>) okEvent -> {
-                        BookFile bookFile;
-                        try {
-                            bookFile = fileProcessingService.createBookFile(fileData, fileName, mimeType, (int) contentLength);
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        } finally {
-                            try {
-                                fileData.close();
-                            } catch (IOException e) {
-                                throw new RuntimeException(e);
-                            }
-                        }
-                        var book = Book.builder()
-                                .name(bookName.getValue())
-                                .author(Collections.singleton(authorsComboBox.getValue()))
-                                .genres(Collections.singleton(genreComboBox.getValue()))
-                                .files(Collections.singletonList(bookFile))
-                                .build();
-                        try {
-                            Book created = bookService.create(book);
-                            dialog.close();
-                        } catch (BusinessException e) {
-                            throw new RuntimeException(e);
-                        }
-
-                    });
-
-
-                    System.out.println(mimeType);
-                    // Do something with the file data
-                    // processFile(fileData, fileName, contentLength, mimeType);
-                });
-
-                dialog.open();
+                UploadDialog uploadDialog = new UploadDialog(authorService, genreService, fileProcessingService, bookService);
+                uploadDialog.open();
             }
         });
         return uploadBtn;
