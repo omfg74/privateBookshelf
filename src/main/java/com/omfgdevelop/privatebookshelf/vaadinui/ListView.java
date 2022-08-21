@@ -96,6 +96,7 @@ public class ListView extends VerticalLayout {
                 Upload singleFileUpload = new Upload(memoryBuffer);
                 Dialog dialog = new Dialog();
                 dialog.setHeaderTitle("Upload book");
+                singleFileUpload.setAcceptedFileTypes("application/pdf", ".pdf", "application/epub+zip", ".epub", "application/fb2", ".fb2");
 
                 TextField bookName = new TextField();
                 bookName.setPlaceholder("New book name");
@@ -165,24 +166,6 @@ public class ListView extends VerticalLayout {
         return uploadBtn;
     }
 
-    private void updateAuthorComboBox(ComboBox<String> comboBox) {
-        authorMap.clear();
-        authorMap.putAll(authorService.findAll().stream().collect(Collectors.toMap(it -> it.getLastName() + " " + it.getFirstName(), it -> it)));
-
-        comboBox.setItems(authorMap.keySet());
-
-
-    }
-
-    private void updateGenreComboBox(ComboBox<String> comboBox) {
-        authorMap.clear();
-        genreMap.putAll(genreService.findAll().stream().collect(Collectors.toMap(Genre::getName, it -> it)));
-
-        comboBox.setItems(authorMap.keySet());
-
-    }
-
-
     private void updateList(String value) {
         var filter = BookFilter.builder()
                 .text(value).build();
@@ -198,5 +181,6 @@ public class ListView extends VerticalLayout {
 
     private void configureGrid() {
         grid.addClassName("grid");
+
     }
 }

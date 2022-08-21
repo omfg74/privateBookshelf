@@ -22,7 +22,7 @@
                     constraint file_pk
                         primary key,
                 name           text      not null,
-                file_extension varchar(5),
+                file_extension varchar(10),
                 book_id        bigint
             );
 

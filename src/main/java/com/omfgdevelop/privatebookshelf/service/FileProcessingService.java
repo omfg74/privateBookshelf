@@ -22,7 +22,11 @@ public class FileProcessingService {
     public BookFile createBookFile(InputStream inputStream, String filename, String mimeType, int contentLength) throws IOException {
 
         var name = UUID.randomUUID().toString();
-        File targetFile = new File(path + name);
+        File file = new File(path);
+        if (!file.exists()) {
+            file.mkdirs();
+        }
+        File targetFile = new File(path + "/" + name);
         OutputStream outStream = new FileOutputStream(targetFile);
 
         byte[] buffer = new byte[contentLength * 1024];
@@ -33,7 +37,7 @@ public class FileProcessingService {
 
         var bookFile = BookFileEntity.builder()
                 .name(name)
-                .fileExtension(filename.split("\\.")[1])
+                .fileExtension(mimeType.replace("application/", "").replace("+zip", ""))
                 .build();
 
         return mapper.map(bookFile);
