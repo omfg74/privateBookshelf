@@ -1,7 +1,11 @@
 package com.omfgdevelop.privatebookshelf.service
 
 import com.omfgdevelop.privatebookshelf.RepositorySpecBase
+import com.omfgdevelop.privatebookshelf.domain.Author
+import com.omfgdevelop.privatebookshelf.domain.Book
+import com.omfgdevelop.privatebookshelf.domain.BookFile
 import com.omfgdevelop.privatebookshelf.domain.BookFilter
+import com.omfgdevelop.privatebookshelf.domain.Genre
 import com.omfgdevelop.privatebookshelf.entity.AuthorEntity
 import com.omfgdevelop.privatebookshelf.entity.BookEntity
 import com.omfgdevelop.privatebookshelf.entity.BookFileEntity
@@ -35,23 +39,25 @@ class BookEntityServiceTest extends RepositorySpecBase {
     def 'can create book'() {
         given:
 
-        var book = BookEntity
+        var book = Book
                 .builder()
                 .name("Tom Soyer")
                 .outlet("Питер")
                 .files(new ArrayList<>(Collections.singletonList(
-                        BookFileEntity.builder().id(10L)
+                        BookFile.builder()
+                                .name("name")
                                 .build())))
-                .genres(new HashSet<>(Collections.singletonList(GenreEntity.builder().name("Fiction").build())))
-                .author(new HashSet<>(Collections.singletonList(AuthorEntity
+                .genres(new HashSet<>(Collections.singletonList(Genre.builder().id(10).name("Fiction").build())))
+                .author(new HashSet<>(Collections.singletonList(Author
                         .builder()
+                        .id(10)
                         .firstName("Mark")
                         .lastName("Twain")
                         .build())))
                 .build()
 
         when:
-        BookEntity created = bookService.create(book)
+        Book created = bookService.create(book)
 
         then:
         created.id != null
@@ -66,12 +72,12 @@ class BookEntityServiceTest extends RepositorySpecBase {
     def 'cant create book no file id error'() {
         given:
 
-        var book = BookEntity
+        var book = Book
                 .builder()
                 .name("Tom Soyer")
                 .outlet("Питер")
-                .genres(new HashSet<>(Collections.singletonList(GenreEntity.builder().name("Fiction").build())))
-                .author(new HashSet<>(Collections.singletonList(AuthorEntity
+                .genres(new HashSet<>(Collections.singletonList(Genre.builder().name("Fiction").build())))
+                .author(new HashSet<>(Collections.singletonList(Author
                         .builder()
                         .firstName("Mark")
                         .lastName("Twain")
@@ -79,7 +85,7 @@ class BookEntityServiceTest extends RepositorySpecBase {
                 .build()
 
         when:
-        BookEntity created = bookService.create(book)
+        Book created = bookService.create(book)
 
         then:
         thrown BusinessException
@@ -89,18 +95,18 @@ class BookEntityServiceTest extends RepositorySpecBase {
     def 'cant create book No author'() {
         given:
 
-        var book = BookEntity
+        var book = Book
                 .builder()
                 .name("Tom Soyer")
                 .outlet("Питер")
                 .files(new ArrayList<>(Collections.singletonList(
-                        BookFileEntity.builder().id(10L)
+                        BookFile.builder().id(10L)
                                 .build())))
-                .genres(new HashSet<>(Collections.singletonList(GenreEntity.builder().name("Fiction").build())))
+                .genres(new HashSet<>(Collections.singletonList(Genre.builder().name("Fiction").build())))
                 .build()
 
         when:
-        BookEntity created = bookService.create(book)
+        Book created = bookService.create(book)
 
         then:
         thrown BusinessException
@@ -110,14 +116,14 @@ class BookEntityServiceTest extends RepositorySpecBase {
     def 'cant create book no genre'() {
         given:
 
-        var book = BookEntity
+        var book = Book
                 .builder()
                 .name("Tom Soyer")
                 .outlet("Питер")
                 .files(new ArrayList<>(Collections.singletonList(
-                        BookFileEntity.builder().id(10L)
+                        BookFile.builder().id(10L)
                                 .build())))
-                .author(new HashSet<>(Collections.singletonList(AuthorEntity
+                .author(new HashSet<>(Collections.singletonList(Author
                         .builder()
                         .firstName("Mark")
                         .lastName("Twain")
@@ -125,7 +131,7 @@ class BookEntityServiceTest extends RepositorySpecBase {
                 .build()
 
         when:
-        BookEntity created = bookService.create(book)
+        Book created = bookService.create(book)
 
         then:
         thrown BusinessException
@@ -154,7 +160,7 @@ class BookEntityServiceTest extends RepositorySpecBase {
         page.getTotalElements() == 1
         page.getContent().stream().toList().get(0).getAuthor().stream().toList().get(0).getId() == 10
         page.getContent().get(0).getName() == "Tom Soyer"
-        page.getContent().get(0).getId()== 101
+        page.getContent().get(0).getId() == 101
     }
 
 

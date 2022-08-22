@@ -5,7 +5,6 @@ import com.omfgdevelop.privatebookshelf.domain.BookFile;
 import com.omfgdevelop.privatebookshelf.domain.BookFilter;
 import com.omfgdevelop.privatebookshelf.entity.AuthorEntity;
 import com.omfgdevelop.privatebookshelf.entity.BookEntity;
-import com.omfgdevelop.privatebookshelf.entity.BookFileEntity;
 import com.omfgdevelop.privatebookshelf.entity.GenreEntity;
 import com.omfgdevelop.privatebookshelf.exception.BusinessError;
 import com.omfgdevelop.privatebookshelf.exception.BusinessException;
@@ -70,9 +69,11 @@ public class BookService {
             throw new BusinessException(BusinessError.NO_FILES_SET_TO_BOOK);
         }
         if (book.getFiles().stream().map(BookFile::getId).filter(Objects::nonNull).toList().size() > 0) {
-            throw new BusinessException(BusinessError.WRONG_FILE_PAREMS_SET);
+            throw new BusinessException(BusinessError.WRONG_FILE_PARAMS_SET);
         }
-        book.getFiles().addAll(bookFileServise.findAllByBookId(book.getId()));
+        if (book.getId() != null) {
+            book.getFiles().addAll(bookFileServise.findAllByBookId(book.getId()));
+        }
 
 //        book.getFiles().forEach(bookFile -> {
 //            if (bookFile.getId() != null) {

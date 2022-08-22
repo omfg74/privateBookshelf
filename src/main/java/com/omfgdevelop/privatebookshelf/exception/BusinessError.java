@@ -6,7 +6,7 @@ public enum BusinessError {
 
     NO_FILES_SET_TO_BOOK(1002, "Книге не присвоен ни один файл"),
 
-    WRONG_FILE_PAREMS_SET(1003,"Укзан несуществующий файл");
+    WRONG_FILE_PARAMS_SET(1003,"Указан несуществующий файл");
 
 
     public final int code;
