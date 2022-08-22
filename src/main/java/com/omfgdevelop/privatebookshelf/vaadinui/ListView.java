@@ -1,8 +1,8 @@
 package com.omfgdevelop.privatebookshelf.vaadinui;
 
-import com.omfgdevelop.privatebookshelf.domain.*;
-import com.omfgdevelop.privatebookshelf.entity.BookFileEntity;
-import com.omfgdevelop.privatebookshelf.exception.BusinessException;
+import com.omfgdevelop.privatebookshelf.domain.Book;
+import com.omfgdevelop.privatebookshelf.domain.BookFilter;
+import com.omfgdevelop.privatebookshelf.domain.Genre;
 import com.omfgdevelop.privatebookshelf.service.AuthorService;
 import com.omfgdevelop.privatebookshelf.service.BookService;
 import com.omfgdevelop.privatebookshelf.service.FileProcessingService;
@@ -12,36 +12,28 @@ import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.combobox.ComboBox;
-import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.component.upload.Upload;
-import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
+import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.value.ValueChangeMode;
+import com.vaadin.flow.function.SerializableBiConsumer;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.StreamResource;
 import org.springframework.data.domain.Page;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
+import java.util.function.Supplier;
 
 
 @PageTitle("Books")
 @Route(value = "")
 public class ListView extends VerticalLayout {
 
-    Grid<Book> grid = new Grid<>(Book.class);
-    TextField filter = new TextField();
+    private final Grid<Book> grid = new Grid<>(Book.class);
+    private final TextField filter = new TextField();
 
     private final FileProcessingService fileProcessingService;
     private final BookService bookService;
@@ -49,10 +41,6 @@ public class ListView extends VerticalLayout {
     private final AuthorService authorService;
 
     private final GenreService genreService;
-
-    private Map<String, Author> authorMap = new ConcurrentHashMap<>();
-
-    private Map<String, Genre> genreMap = new ConcurrentHashMap<>();
 
 
     public ListView(BookService bookService, FileProcessingService fileProcessingService, AuthorService authorService, GenreService genreService) {
@@ -65,6 +53,10 @@ public class ListView extends VerticalLayout {
         grid.setColumns("name");
         grid.addColumn(book -> Arrays.toString(book.getAuthor().stream().map(it -> it.getFirstName() + " " + it.getLastName()).toArray()).replace("[", "").replace("]", "")).setHeader("Author");
         grid.addColumn(book -> Arrays.toString(book.getGenres().stream().map(Genre::getName).toArray()).replace("[", "").replace("]", "")).setHeader("Genres");
+        grid.addColumn(new ComponentRenderer<>(ButtonAggregator::new, (SerializableBiConsumer<ButtonAggregator, Book>) (buttonAggregator, book) -> book.getFiles().forEach(it ->
+                buttonAggregator.addButton(it.getFileExtension(), "download",
+                        () -> new StreamResource(book.getName()+"."+it.getFileExtension(),
+                                () -> fileProcessingService.getStream(it)).setContentType(it.getFileExtension())))));
 
         updateList(null);
         configureGrid();

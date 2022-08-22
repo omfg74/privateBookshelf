@@ -53,4 +53,17 @@ public class FileProcessingService {
 
         return mapper.map(bookFile);
     }
+
+    public InputStream getStream(BookFile bookFile) {
+        File file = new File(path + "/" + bookFile.getName());
+        FileInputStream stream = null;
+        try {
+            stream = new FileInputStream(file);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        return stream;
+    }
+
+
 }

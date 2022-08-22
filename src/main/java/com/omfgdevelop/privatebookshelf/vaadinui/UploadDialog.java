@@ -64,7 +64,7 @@ public class UploadDialog extends Dialog {
     }
 
     private void addViews() {
-        this.add(addCloseBtn());
+        this.getHeader().add(addCloseBtn());
         this.add(singleFileUpload);
         this.add(bookName);
         this.add(authorComboBox);
@@ -78,20 +78,17 @@ public class UploadDialog extends Dialog {
         singleFileUpload = new Upload(memoryBuffer);
         singleFileUpload.setAcceptedFileTypes("application/pdf", ".pdf", "application/epub+zip", ".epub", "application/fb2", ".fb2");
 
-        singleFileUpload.addSucceededListener(new ComponentEventListener<SucceededEvent>() {
-            @Override
-            public void onComponentEvent(SucceededEvent uploadEvent) {
-                final InputStream fileData = memoryBuffer.getInputStream();
-                final String fileName = uploadEvent.getFileName();
-                final long contentLength = uploadEvent.getContentLength();
-                final String mimeType = uploadEvent.getMIMEType();
+        singleFileUpload.addSucceededListener((ComponentEventListener<SucceededEvent>) uploadEvent -> {
+            final InputStream fileData = memoryBuffer.getInputStream();
+            final String fileName = uploadEvent.getFileName();
+            final long contentLength = uploadEvent.getContentLength();
+            final String mimeType = uploadEvent.getMIMEType();
 
-                okBtn.addClickListener((ComponentEventListener<ClickEvent<Button>>) okEvent -> {
-                    onOkPressed(fileData, fileName, mimeType, (int) contentLength);
-                    close();
-                });
+            okBtn.addClickListener((ComponentEventListener<ClickEvent<Button>>) okEvent -> {
+                onOkPressed(fileData, fileName, mimeType, (int) contentLength);
+                close();
+            });
 
-            }
         });
 
     }
@@ -117,7 +114,7 @@ public class UploadDialog extends Dialog {
                 .files(Collections.singletonList(bookFile))
                 .build();
         try {
-            Book created = bookService.create(book);
+            bookService.create(book);
         } catch (BusinessException e) {
             throw new RuntimeException(e);
         }
@@ -144,6 +141,7 @@ public class UploadDialog extends Dialog {
     private ComboBox<Author> createAuthorCombobox() {
         ComboBox<Author> authorsComboBox = new ComboBox<>();
         authorsComboBox.setItems(authorService.findAll());
+        authorsComboBox.setPlaceholder("Select author");
         authorsComboBox.setItemLabelGenerator(it -> it.getLastName() + " " + it.getFirstName());
         return authorsComboBox;
     }
@@ -151,6 +149,7 @@ public class UploadDialog extends Dialog {
     private ComboBox<Genre> createGenreCombobox() {
         ComboBox<Genre> genreComboBox = new ComboBox<>();
         genreComboBox.setItems(genreService.findAll());
+        genreComboBox.setPlaceholder("Select genres");
         genreComboBox.setItemLabelGenerator(Genre::getName);
         return genreComboBox;
     }
