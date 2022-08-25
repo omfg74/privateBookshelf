@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
-public class BookService  {
+public class BookService {
 
     private final BookRepository bookRepository;
 
@@ -96,10 +96,8 @@ public class BookService  {
     }
 
     private List<Book> pageProcessor(Page<BookEntity> list) {
-        return list.stream()
+        return list.stream().distinct()
                 .map(mapper::map)
-                .collect(Collectors.toSet())
-                .stream()
                 .toList();
     }
 

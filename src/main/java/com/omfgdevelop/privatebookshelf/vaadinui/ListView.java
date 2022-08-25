@@ -46,11 +46,9 @@ public class ListView extends VerticalLayout {
 
     private final GenreService genreService;
 
-//    private final PaginatedGrid<Book> grid = new PaginatedGrid<>(Book.class);
+    private static final int PAGE_SIZE = 50;
 
-    private static final int PAGE_SIZE = 10;
-
-    private ConfigurableFilterDataProvider<Book, Void, String> provider;
+    private final ConfigurableFilterDataProvider<Book, Void, String> provider;
 
     private final FilterService filterService;
 
@@ -111,7 +109,8 @@ public class ListView extends VerticalLayout {
         grid.setPageSize(PAGE_SIZE);
         grid.setDataProvider(provider);
         grid.setColumns("name");
-        grid.sort(List.of(new GridSortOrder<Book>(grid.getColumnByKey("name"), SortDirection.ASCENDING)));
+//        grid.sort(List.of(new GridSortOrder<Book>(grid.getColumnByKey("name"), SortDirection.ASCENDING)));
+        grid.getColumns().forEach(it -> it.setSortable(false));
         grid.addColumn(book -> Arrays.toString(book.getAuthor().stream().map(it -> it.getFirstName() + " " + it.getLastName()).toArray()).replace("[", "").replace("]", "")).setHeader("Author");
         grid.addColumn(book -> Arrays.toString(book.getGenres().stream().map(Genre::getName).toArray()).replace("[", "").replace("]", "")).setHeader("Genres");
         grid.addColumn(new ComponentRenderer<>(ButtonAggregator::new, (SerializableBiConsumer<ButtonAggregator, Book>) (buttonAggregator, book) -> book.getFiles().forEach(it ->
