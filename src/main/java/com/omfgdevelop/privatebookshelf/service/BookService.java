@@ -12,9 +12,11 @@ import com.omfgdevelop.privatebookshelf.mapper.UberMapper;
 import com.omfgdevelop.privatebookshelf.repository.BookRepository;
 import com.omfgdevelop.privatebookshelf.utils.Domain;
 import com.omfgdevelop.privatebookshelf.utils.FilteredQueryWithPagingRequest;
+import com.omfgdevelop.privatebookshelf.utils.PageableRepository;
 import com.omfgdevelop.privatebookshelf.utils.SearchProcessor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +28,7 @@ import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
-public class BookService {
+public class BookService  {
 
     private final BookRepository bookRepository;
 
@@ -36,7 +38,7 @@ public class BookService {
 
     private final BookFileService bookFileServise;
 
-    private final static int MAX_PAGE_SIZE = 20;
+    private final static int MAX_PAGE_SIZE = 10;
 
     public BookEntity getBookById(Long id) {
         return bookRepository.findById(id).orElseThrow();
@@ -90,7 +92,7 @@ public class BookService {
 
     private Specification<BookEntity> getWhereClose(BookFilter filter) {
 
-        return Domain.byString(BookEntity.Fields.name, filter.getText());
+        return Domain.<BookEntity>byString(BookEntity.Fields.name, filter.getText());
     }
 
     private List<Book> pageProcessor(Page<BookEntity> list) {
@@ -101,13 +103,17 @@ public class BookService {
                 .toList();
     }
 
-    public Page<Book> getBookPage(FilteredQueryWithPagingRequest<BookFilter> request) {
-
-        Page<Book> page = SearchProcessor.findPage(request,
+    public Page<Book> findPage(FilteredQueryWithPagingRequest<BookFilter> request) {
+        request.setSortingFields(List.of(BookEntity.Fields.name));
+        request.setSortDirection(Sort.Direction.ASC);
+        return SearchProcessor.findPage(request,
                 bookRepository,
                 this::getWhereClose,
                 this::pageProcessor,
                 MAX_PAGE_SIZE);
-        return page;
+    }
+
+    public int count(BookFilter filter) {
+        return (int) bookRepository.count(getWhereClose(filter));
     }
 }

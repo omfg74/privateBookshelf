@@ -6,6 +6,8 @@ import com.omfgdevelop.privatebookshelf.domain.Book;
 import com.omfgdevelop.privatebookshelf.domain.BookFile;
 import com.omfgdevelop.privatebookshelf.domain.Genre;
 import com.omfgdevelop.privatebookshelf.exception.BusinessException;
+import com.omfgdevelop.privatebookshelf.filtr.AuthorFilter;
+import com.omfgdevelop.privatebookshelf.filtr.GenreFilter;
 import com.omfgdevelop.privatebookshelf.service.AuthorService;
 import com.omfgdevelop.privatebookshelf.service.BookService;
 import com.omfgdevelop.privatebookshelf.service.FileProcessingService;
@@ -21,6 +23,11 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.upload.SucceededEvent;
 import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
+import com.vaadin.flow.data.provider.CallbackDataProvider;
+import com.vaadin.flow.data.provider.ConfigurableFilterDataProvider;
+import com.vaadin.flow.data.provider.DataProvider;
+import org.atmosphere.interceptor.AtmosphereResourceStateRecovery;
+import org.springframework.data.domain.Page;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -45,6 +52,9 @@ public class UploadDialog extends Dialog {
     ComboBox<Author> authorComboBox;
     ComboBox<Genre> genreComboBox;
 
+    private final DataProvider<Author, String> authorProvider;
+    private final DataProvider<Genre, String> genreProvider;
+
 
     public UploadDialog(AuthorService authorService, GenreService genreService, FileProcessingService fileProcessingService, BookService bookService) {
         this.authorService = authorService;
@@ -53,6 +63,9 @@ public class UploadDialog extends Dialog {
         this.bookService = bookService;
 
         this.setHeaderTitle("Upload book");
+
+        authorProvider = getAuthorProvider();
+        genreProvider = getGenreProvider();
 
         okBtn = addOkBtn();
         bookName = createBookNameTextField();
@@ -140,17 +153,43 @@ public class UploadDialog extends Dialog {
 
     private ComboBox<Author> createAuthorCombobox() {
         ComboBox<Author> authorsComboBox = new ComboBox<>();
-        authorsComboBox.setItems(authorService.findAll());
+        ConfigurableFilterDataProvider<Author, Void, String>
+                wrapper = authorProvider.withConfigurableFilter();
+
+        authorsComboBox.setDataProvider(authorProvider);
         authorsComboBox.setPlaceholder("Select author");
+        authorsComboBox.addValueChangeListener(e -> wrapper.setFilter(e.getValue().getLastName() + " " + e.getValue().getFirstName()));
         authorsComboBox.setItemLabelGenerator(it -> it.getLastName() + " " + it.getFirstName());
         return authorsComboBox;
     }
 
     private ComboBox<Genre> createGenreCombobox() {
         ComboBox<Genre> genreComboBox = new ComboBox<>();
-        genreComboBox.setItems(genreService.findAll());
+        ConfigurableFilterDataProvider<Genre, Void, String>
+                wrapper = genreProvider.withConfigurableFilter();
+
+        genreComboBox.setDataProvider(genreProvider);
         genreComboBox.setPlaceholder("Select genres");
         genreComboBox.setItemLabelGenerator(Genre::getName);
+        genreComboBox.addValueChangeListener(e -> wrapper.setFilter(e.getValue().getName()));
         return genreComboBox;
+    }
+
+    private DataProvider<Author, String> getAuthorProvider() {
+        return DataProvider.fromFilteringCallbacks((CallbackDataProvider.FetchCallback<Author, String>) query -> {
+            Page<Author> page = authorService.findPage(query);
+            return page.stream();
+        }, (CallbackDataProvider.CountCallback<Author, String>) query ->
+                authorService.getCount(AuthorFilter.builder().text(query.getFilter().orElse(null)).build()));
+
+
+    }
+
+    private DataProvider<Genre, String> getGenreProvider() {
+        return DataProvider.fromFilteringCallbacks((CallbackDataProvider.FetchCallback<Genre, String>) query -> {
+            Page<Genre> page = genreService.findPage(query);
+            return page.stream();
+        }, (CallbackDataProvider.CountCallback<Genre, String>) query ->
+                genreService.getCount(GenreFilter.builder().text(query.getFilter().orElse(null)).build()));
     }
 }

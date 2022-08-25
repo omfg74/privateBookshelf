@@ -1,5 +1,6 @@
 package com.omfgdevelop.privatebookshelf.domain;
 
+import com.omfgdevelop.privatebookshelf.utils.TextFiltering;
 import lombok.*;
 
 @Getter

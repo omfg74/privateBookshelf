@@ -1,6 +1,7 @@
 package com.omfgdevelop.privatebookshelf.entity;
 
 import lombok.*;
+import lombok.experimental.FieldNameConstants;
 import lombok.experimental.SuperBuilder;
 
 import javax.persistence.*;
@@ -13,6 +14,7 @@ import java.util.Set;
 @Setter
 @SuperBuilder
 @NoArgsConstructor
+@FieldNameConstants
 public class GenreEntity {
 
     @Id

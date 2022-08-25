@@ -1,7 +1,11 @@
 package com.omfgdevelop.privatebookshelf.utils;
 
 
+import com.vaadin.flow.data.provider.SortDirection;
 import lombok.*;
+import org.springframework.data.domain.Sort;
+
+import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -14,6 +18,10 @@ public class FilteredQueryWithPagingRequest<T> {
 
     private int pageNumber;
     private Integer pageSize;
+
+    private List<String> sortingFields;
+
+    private Sort.Direction sortDirection;
 
 }
 

@@ -1,21 +1,26 @@
 package com.omfgdevelop.privatebookshelf.vaadinui;
 
-import com.omfgdevelop.privatebookshelf.domain.Book;
-import com.omfgdevelop.privatebookshelf.domain.BookFilter;
-import com.omfgdevelop.privatebookshelf.domain.Genre;
+import com.omfgdevelop.privatebookshelf.domain.*;
+import com.omfgdevelop.privatebookshelf.exception.BusinessException;
 import com.omfgdevelop.privatebookshelf.service.AuthorService;
 import com.omfgdevelop.privatebookshelf.service.BookService;
 import com.omfgdevelop.privatebookshelf.service.FileProcessingService;
 import com.omfgdevelop.privatebookshelf.service.GenreService;
-import com.omfgdevelop.privatebookshelf.utils.FilteredQueryWithPagingRequest;
+import com.omfgdevelop.privatebookshelf.utils.DataProviderFactory;
+import com.omfgdevelop.privatebookshelf.utils.FilterService;
 import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.GridSortOrder;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.provider.CallbackDataProvider;
+import com.vaadin.flow.data.provider.ConfigurableFilterDataProvider;
+import com.vaadin.flow.data.provider.DataProvider;
+import com.vaadin.flow.data.provider.SortDirection;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.function.SerializableBiConsumer;
@@ -24,8 +29,7 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.StreamResource;
 import org.springframework.data.domain.Page;
 
-import java.util.Arrays;
-import java.util.function.Supplier;
+import java.util.*;
 
 
 @PageTitle("Books")
@@ -42,23 +46,26 @@ public class ListView extends VerticalLayout {
 
     private final GenreService genreService;
 
+//    private final PaginatedGrid<Book> grid = new PaginatedGrid<>(Book.class);
 
-    public ListView(BookService bookService, FileProcessingService fileProcessingService, AuthorService authorService, GenreService genreService) {
+    private static final int PAGE_SIZE = 10;
+
+    private ConfigurableFilterDataProvider<Book, Void, String> provider;
+
+    private final FilterService filterService;
+
+    public ListView(BookService bookService, FileProcessingService fileProcessingService, AuthorService authorService, GenreService genreService, DataProviderFactory dataProviderFactory, FilterService filterService) throws BusinessException {
         this.bookService = bookService;
         this.fileProcessingService = fileProcessingService;
         this.authorService = authorService;
         this.genreService = genreService;
+        this.filterService = filterService;
         addClassName("list-view");
         setSizeFull();
-        grid.setColumns("name");
-        grid.addColumn(book -> Arrays.toString(book.getAuthor().stream().map(it -> it.getFirstName() + " " + it.getLastName()).toArray()).replace("[", "").replace("]", "")).setHeader("Author");
-        grid.addColumn(book -> Arrays.toString(book.getGenres().stream().map(Genre::getName).toArray()).replace("[", "").replace("]", "")).setHeader("Genres");
-        grid.addColumn(new ComponentRenderer<>(ButtonAggregator::new, (SerializableBiConsumer<ButtonAggregator, Book>) (buttonAggregator, book) -> book.getFiles().forEach(it ->
-                buttonAggregator.addButton(it.getFileExtension(), "download",
-                        () -> new StreamResource(book.getName()+"."+it.getFileExtension(),
-                                () -> fileProcessingService.getStream(it)).setContentType(it.getFileExtension())))));
 
-        updateList(null);
+
+        provider = getBookProvider();
+
         configureGrid();
         add(getToolbar(), grid);
 
@@ -69,11 +76,11 @@ public class ListView extends VerticalLayout {
         filter.setPlaceholder("Find by..");
         filter.setClearButtonVisible(true);
         filter.setValueChangeMode(ValueChangeMode.LAZY);
-        filter.addValueChangeListener(value -> updateList(value.getValue()));
+        filter.addValueChangeListener(e -> provider.setFilter(e.getValue()));
 
         var button = new Button("Find");
         var toolbar = new HorizontalLayout(filter, button);
-        button.addClickListener((ComponentEventListener<ClickEvent<Button>>) event -> updateList(filter.getValue()));
+        button.addClickListener((ComponentEventListener<ClickEvent<Button>>) event -> provider.setFilter(filter.getValue()));
         toolbar.addClassName("toolbar");
         toolbar.add(createUploadButton());
         return toolbar;
@@ -81,32 +88,37 @@ public class ListView extends VerticalLayout {
 
     private Button createUploadButton() {
         var uploadBtn = new Button("Upload");
-        uploadBtn.addClickListener(new ComponentEventListener<ClickEvent<Button>>() {
-
-            @Override
-            public void onComponentEvent(ClickEvent<Button> event) {
-                UploadDialog uploadDialog = new UploadDialog(authorService, genreService, fileProcessingService, bookService);
-                uploadDialog.open();
-            }
+        uploadBtn.addClickListener((ComponentEventListener<ClickEvent<Button>>) event -> {
+            UploadDialog uploadDialog = new UploadDialog(authorService, genreService, fileProcessingService, bookService);
+            uploadDialog.open();
         });
         return uploadBtn;
     }
 
-    private void updateList(String value) {
-        var filter = BookFilter.builder()
-                .text(value).build();
-        FilteredQueryWithPagingRequest<BookFilter> request = new FilteredQueryWithPagingRequest<>();
-        request.setFilter(filter);
-        request.setPageNumber(0);
-        request.setPageSize(100);
-
-        Page<Book> page = bookService.getBookPage(request);
-        grid.setItems(page.stream().toList());
+    private ConfigurableFilterDataProvider<Book, Void, String> getBookProvider() {
+        return DataProvider.fromFilteringCallbacks((CallbackDataProvider.FetchCallback<Book, String>) query -> {
+                    Page<Book> page = bookService.findPage(filterService.getFilter(query, BookFilter.builder().text(query.getFilter().orElse(null)).build()));
+                    return page.stream();
+                }, (CallbackDataProvider.CountCallback<Book, String>) query -> bookService
+                        .count(BookFilter.builder()
+                                .text(query.getFilter().orElse(null))
+                                .build()))
+                .withConfigurableFilter();
     }
-
 
     private void configureGrid() {
         grid.addClassName("grid");
-
+        grid.setPageSize(PAGE_SIZE);
+        grid.setDataProvider(provider);
+        grid.setColumns("name");
+        grid.sort(List.of(new GridSortOrder<Book>(grid.getColumnByKey("name"), SortDirection.ASCENDING)));
+        grid.addColumn(book -> Arrays.toString(book.getAuthor().stream().map(it -> it.getFirstName() + " " + it.getLastName()).toArray()).replace("[", "").replace("]", "")).setHeader("Author");
+        grid.addColumn(book -> Arrays.toString(book.getGenres().stream().map(Genre::getName).toArray()).replace("[", "").replace("]", "")).setHeader("Genres");
+        grid.addColumn(new ComponentRenderer<>(ButtonAggregator::new, (SerializableBiConsumer<ButtonAggregator, Book>) (buttonAggregator, book) -> book.getFiles().forEach(it ->
+                buttonAggregator.addButton(it.getFileExtension(), "download",
+                        () -> new StreamResource(book.getName() + "." + it.getFileExtension(),
+                                () -> fileProcessingService.getStream(it)).setContentType(it.getFileExtension())))));
     }
+
+
 }

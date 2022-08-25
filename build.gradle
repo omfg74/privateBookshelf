@@ -1,9 +1,9 @@
 plugins {
-	id 'org.springframework.boot' version '2.5.4'
-	id 'io.spring.dependency-management' version '1.0.12.RELEASE'
-	id 'com.vaadin' version '23.1.2'
-	id 'java'
-	id 'groovy'
+    id 'org.springframework.boot' version '2.5.4'
+    id 'io.spring.dependency-management' version '1.0.12.RELEASE'
+    id 'com.vaadin' version '23.1.2'
+    id 'java'
+    id 'groovy'
 
 }
 
@@ -12,55 +12,61 @@ version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '17'
 
 configurations {
-	compileOnly {
-		extendsFrom annotationProcessor
-	}
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
 }
 
 repositories {
-	mavenCentral()
+    mavenCentral()
+    maven {
+        url "https://maven.vaadin.com/vaadin-addons"
+    }
 }
 
 ext {
-	set('testcontainersVersion', "1.17.3")
-	set('vaadinVersion', "23.1.2")
+    set('testcontainersVersion', "1.17.3")
+    set('vaadinVersion', "23.1.2")
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-actuator'
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
-	implementation 'org.springframework.boot:spring-boot-starter-security'
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'com.vaadin:vaadin-spring-boot-starter'
-	compileOnly 'org.projectlombok:lombok'
-	runtimeOnly 'org.postgresql:postgresql'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'com.vaadin:vaadin-spring-boot-starter'
+    implementation 'org.vaadin.klaudeta:grid-pagination:2.0.10'
 
-	implementation 'org.mapstruct:mapstruct:1.5.2.Final'
 
-	annotationProcessor 'org.projectlombok:lombok'
-	annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.2.Final'
+    compileOnly 'org.projectlombok:lombok'
+    runtimeOnly 'org.postgresql:postgresql'
 
+    implementation 'org.mapstruct:mapstruct:1.5.2.Final'
+
+    annotationProcessor 'org.projectlombok:lombok'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.2.Final'
 
 
 //TEST
-	testImplementation 'org.spockframework:spock-core:2.1-groovy-3.0'
-	testImplementation 'org.spockframework:spock-spring:2.1-groovy-3.0'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'org.springframework.security:spring-security-test'
-	testImplementation 'org.testcontainers:junit-jupiter'
-	testImplementation 'org.testcontainers:postgresql'
+    testImplementation 'org.spockframework:spock-core:2.1-groovy-3.0'
+    testImplementation 'org.spockframework:spock-spring:2.1-groovy-3.0'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+    testImplementation 'org.testcontainers:junit-jupiter'
+    testImplementation 'org.testcontainers:postgresql'
 
 
 }
 
 dependencyManagement {
-	imports {
-		mavenBom "com.vaadin:vaadin-bom:${vaadinVersion}"
-		mavenBom "org.testcontainers:testcontainers-bom:${testcontainersVersion}"
-	}
+    imports {
+        mavenBom "com.vaadin:vaadin-bom:${vaadinVersion}"
+        mavenBom "org.testcontainers:testcontainers-bom:${testcontainersVersion}"
+    }
 }
 
+
 tasks.named('test') {
-	useJUnitPlatform()
+    useJUnitPlatform()
 }

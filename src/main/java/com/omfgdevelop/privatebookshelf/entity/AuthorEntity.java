@@ -1,6 +1,7 @@
 package com.omfgdevelop.privatebookshelf.entity;
 
 import lombok.*;
+import lombok.experimental.FieldNameConstants;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -14,6 +15,7 @@ import java.util.Set;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@FieldNameConstants
 public class AuthorEntity implements Serializable {
     @Id
     @Column(name = "id", nullable = false)
