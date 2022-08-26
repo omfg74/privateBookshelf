@@ -40,3 +40,7 @@ out/
 /webpack.config.js
 /webpack.generated.js
 /src/main/resources/tmp/
+/.dockerignore
+
+
+src/main/resources/tmp/storage/bookshelf

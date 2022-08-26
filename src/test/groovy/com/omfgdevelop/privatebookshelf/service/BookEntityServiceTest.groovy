@@ -150,7 +150,7 @@ class BookEntityServiceTest extends RepositorySpecBase {
                 .build()
 
         when:
-        Page page = bookService.getBookPage(request);
+        Page page = bookService.findPage(request);
 
 
         then:

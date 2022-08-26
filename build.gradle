@@ -17,6 +17,10 @@ configurations {
     }
 }
 
+ext{
+    title = "BOOK.SHELF"
+}
+
 repositories {
     mavenCentral()
     maven {
@@ -69,4 +73,13 @@ dependencyManagement {
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+bootJar{
+    archiveName = "book-shelf.jar"
+    mainClassName = "com.omfgdevelop.privatebookshelf.PrivatebookshelfApplication"
+
+    manifest {
+        attributes 'Implementation-Title': "${title}"
+    }
 }
