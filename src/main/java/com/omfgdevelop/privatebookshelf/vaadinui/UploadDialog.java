@@ -36,22 +36,14 @@ import java.util.Collections;
 public class UploadDialog extends Dialog {
     private final AuthorService authorService;
     private final GenreService genreService;
-
     private final FileProcessingService fileProcessingService;
-
     private final BookService bookService;
-
     private Upload singleFileUpload;
-
     MemoryBuffer memoryBuffer = new MemoryBuffer();
-
     Button okBtn;
-
     TextField bookName;
-
     ComboBox<Author> authorComboBox;
     ComboBox<Genre> genreComboBox;
-
     private final DataProvider<Author, String> authorProvider;
     private final DataProvider<Genre, String> genreProvider;
 

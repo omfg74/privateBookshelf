@@ -1,6 +1,8 @@
 package com.omfgdevelop.privatebookshelf.vaadinui;
 
-import com.omfgdevelop.privatebookshelf.domain.*;
+import com.omfgdevelop.privatebookshelf.domain.Book;
+import com.omfgdevelop.privatebookshelf.domain.BookFilter;
+import com.omfgdevelop.privatebookshelf.domain.Genre;
 import com.omfgdevelop.privatebookshelf.exception.BusinessException;
 import com.omfgdevelop.privatebookshelf.service.AuthorService;
 import com.omfgdevelop.privatebookshelf.service.BookService;
@@ -13,14 +15,12 @@ import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.grid.GridSortOrder;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.CallbackDataProvider;
 import com.vaadin.flow.data.provider.ConfigurableFilterDataProvider;
 import com.vaadin.flow.data.provider.DataProvider;
-import com.vaadin.flow.data.provider.SortDirection;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.function.SerializableBiConsumer;
@@ -29,7 +29,7 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.StreamResource;
 import org.springframework.data.domain.Page;
 
-import java.util.*;
+import java.util.Arrays;
 
 
 @PageTitle("Books")
@@ -52,13 +52,14 @@ public class ListView extends VerticalLayout {
 
     private final FilterService filterService;
 
+
     public ListView(BookService bookService, FileProcessingService fileProcessingService, AuthorService authorService, GenreService genreService, DataProviderFactory dataProviderFactory, FilterService filterService) throws BusinessException {
         this.bookService = bookService;
         this.fileProcessingService = fileProcessingService;
         this.authorService = authorService;
         this.genreService = genreService;
         this.filterService = filterService;
-        addClassName("list-view");
+        addClassName("book-create-dialog");
         setSizeFull();
 
 
@@ -69,6 +70,21 @@ public class ListView extends VerticalLayout {
 
     }
 
+    private Button createAuthorDialogButton() {
+        return new Button("Add new author", e -> {
+            AuthorDialog authorDialog = new AuthorDialog(authorService);
+            authorDialog.open();
+        });
+
+    }
+
+    private Button createGenreDialogButton() {
+        return new Button("Add new genre", e -> {
+            GenreDialog genreDialog = new GenreDialog(genreService);
+            genreDialog.open();
+        });
+
+    }
 
     private Component getToolbar() {
         filter.setPlaceholder("Find by..");
@@ -81,6 +97,8 @@ public class ListView extends VerticalLayout {
         button.addClickListener((ComponentEventListener<ClickEvent<Button>>) event -> provider.setFilter(filter.getValue()));
         toolbar.addClassName("toolbar");
         toolbar.add(createUploadButton());
+        toolbar.add(createAuthorDialogButton());
+        toolbar.add(createGenreDialogButton());
         return toolbar;
     }
 

@@ -53,6 +53,10 @@ public class GenreService {
     }
 
     public int getCount(GenreFilter filter) {
-        return (int) genreRepository.count();
+        return (int) genreRepository.count(getWhereClose(filter));
+    }
+
+    public Genre create(Genre genre) {
+        return mapper.map(genreRepository.save(mapper.map(genre)));
     }
 }

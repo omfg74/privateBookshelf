@@ -52,4 +52,8 @@ public class AuthorService {
     public int getCount(AuthorFilter filter) {
         return (int) authorRepository.count(getWhereClose(filter));
     }
+
+    public Author create(Author author) {
+        return mapper.map(authorRepository.save(mapper.map(author)));
+    }
 }

@@ -27,4 +27,8 @@ public interface UberMapper {
     BookFile map(BookFileEntity bookFile);
 
     BookFile map(BookFile source);
-}
+
+    AuthorEntity map(Author author);
+
+    GenreEntity map(Genre genre);
+    }
