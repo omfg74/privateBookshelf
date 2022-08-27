@@ -19,6 +19,7 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.upload.SucceededEvent;
 import com.vaadin.flow.component.upload.Upload;
@@ -26,12 +27,12 @@ import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
 import com.vaadin.flow.data.provider.CallbackDataProvider;
 import com.vaadin.flow.data.provider.ConfigurableFilterDataProvider;
 import com.vaadin.flow.data.provider.DataProvider;
-import org.atmosphere.interceptor.AtmosphereResourceStateRecovery;
 import org.springframework.data.domain.Page;
+import org.vaadin.gatanaso.MultiselectComboBox;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collections;
+import java.util.*;
 
 public class UploadDialog extends Dialog {
     private final AuthorService authorService;
@@ -43,9 +44,11 @@ public class UploadDialog extends Dialog {
     Button okBtn;
     TextField bookName;
     ComboBox<Author> authorComboBox;
-    ComboBox<Genre> genreComboBox;
+    MultiselectComboBox<Genre> genreComboBox;
     private final DataProvider<Author, String> authorProvider;
     private final DataProvider<Genre, String> genreProvider;
+
+    private final Set<Genre> selectedGenres = new HashSet<>();
 
 
     public UploadDialog(AuthorService authorService, GenreService genreService, FileProcessingService fileProcessingService, BookService bookService) {
@@ -61,9 +64,12 @@ public class UploadDialog extends Dialog {
 
         okBtn = addOkBtn();
         bookName = createBookNameTextField();
+        bookName.setLabel("Book name");
         authorComboBox = createAuthorCombobox();
+        authorComboBox.setLabel("Author");
         genreComboBox = createGenreCombobox();
-
+        genreComboBox.setLabel("Genre");
+        selectedGenres.clear();
         prepareUploadComponent();
         addViews();
     }
@@ -71,9 +77,11 @@ public class UploadDialog extends Dialog {
     private void addViews() {
         this.getHeader().add(addCloseBtn());
         this.add(singleFileUpload);
-        this.add(bookName);
-        this.add(authorComboBox);
-        this.add(genreComboBox);
+        var verticalLayout = new VerticalLayout();
+        verticalLayout.add(bookName);
+        verticalLayout.add(authorComboBox);
+        verticalLayout.add(genreComboBox);
+        this.add(verticalLayout);
         this.getFooter().add(okBtn);
     }
 
@@ -115,7 +123,7 @@ public class UploadDialog extends Dialog {
         var book = Book.builder()
                 .name(bookName.getValue())
                 .author(Collections.singleton(authorComboBox.getValue()))
-                .genres(Collections.singleton(genreComboBox.getValue()))
+                .genres(selectedGenres)
                 .files(Collections.singletonList(bookFile))
                 .build();
         try {
@@ -132,7 +140,7 @@ public class UploadDialog extends Dialog {
     }
 
     private Button addCloseBtn() {
-        Button closeButton = new Button(new Icon("lumo", "cross"), (e) -> this.close());
+        Button closeButton = new Button("Close", (e) -> this.close());
         closeButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
         return closeButton;
     }
@@ -155,15 +163,19 @@ public class UploadDialog extends Dialog {
         return authorsComboBox;
     }
 
-    private ComboBox<Genre> createGenreCombobox() {
-        ComboBox<Genre> genreComboBox = new ComboBox<>();
+    private MultiselectComboBox<Genre> createGenreCombobox() {
+        MultiselectComboBox<Genre> genreComboBox = new MultiselectComboBox<>();
         ConfigurableFilterDataProvider<Genre, Void, String>
                 wrapper = genreProvider.withConfigurableFilter();
 
         genreComboBox.setDataProvider(genreProvider);
         genreComboBox.setPlaceholder("Select genres");
         genreComboBox.setItemLabelGenerator(Genre::getName);
-        genreComboBox.addValueChangeListener(e -> wrapper.setFilter(e.getValue().getName()));
+        genreComboBox.addValueChangeListener(e -> {
+            wrapper.setFilter(e.getValue().stream().reduce((f, s) -> s).orElse(new Genre()).getName());
+            selectedGenres.clear();
+            selectedGenres.addAll(e.getValue().stream().toList());
+        });
         return genreComboBox;
     }
 
