@@ -39,9 +39,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'com.vaadin:vaadin-spring-boot-starter'
-    implementation 'org.vaadin.klaudeta:grid-pagination:2.0.10'
-
+    implementation 'com.vaadin:vaadin-spring-boot-starter:23.1.6'
+    implementation 'org.vaadin.gatanaso:multiselect-combo-box-flow:4.0.0-rc2'
 
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'org.postgresql:postgresql'

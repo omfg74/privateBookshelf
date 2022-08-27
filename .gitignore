@@ -44,3 +44,6 @@ out/
 
 
 src/main/resources/tmp/storage/bookshelf
+/package-lock.json
+/frontend/
+/lib/
