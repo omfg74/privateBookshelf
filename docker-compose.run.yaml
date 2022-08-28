@@ -26,11 +26,16 @@ services:
       - /bin/bash
       - -c
       - |
+        mkdir /tmp/runtime
+        chmod -R 777 /tmp/runtime
         ./gradlew clean
         ./gradlew bootJar
         cp build/libs/book-shelf.jar /tmp/runtime
         cd /tmp/runtime
+        chmod -R 777 /tmp/runtime
         java -jar book-shelf
+        sleep 1000000
+
 
   postgres:
     image: postgres:14
