@@ -1,23 +1,17 @@
 FROM ubuntu
 
-VOLUME [ "/source" ]
-VOLUME [ "/runtime" ]
-### openjdk:17 image has troubles running on arm v7 cpu
-RUN apt update
-RUN apt install openjdk-17-jdk -y
+RUN apt update && apt install openjdk-17-jdk -y
+VOLUME ['/runtime']
+#RUN #microdnf install findutils
+ENV LANG=en_US.UTF-8 \
+    LANGUAGE=en_US:en \
+    LC_ALL=en_US.UTF-8
 
-
-WORKDIR /source
-RUN mkdir /scripts
-#RUN #mkdir /executable
-#WORKDIR /executable
-RUN echo "#!/bin/bash" >> /scripts/compile.sh
-RUN echo "echo \"start\"" >> /scripts/compile.sh
-RUN echo "./gradlew bootJar" >> /scripts/compile.sh
-RUN echo "mv build/libs/book-shelf.jar /runtime" >> /scripts/compile.sh
-RUN echo "echo \"finish\"" >> /scripts/compile.sh
-RUN chmod +x /scripts/compile.sh
-
-RUN exit
-
-ENTRYPOINT [ "/scripts/compile.sh" ]
+RUN mkdir runtime
+RUN mkdir /compile
+COPY ../* /compile
+RUN cd /compile &&  ./gradlew clean
+RUN #cd /compile &&  ./gradlew rm -rf node_modules
+RUN cd /compile &&  ./gradlew bootJar
+RUN cp /compile/build/libs/book-shelf.jar /runtime
+RUN chmod -R 777 /runtime

@@ -1,0 +1,34 @@
+version: '3'
+
+services:
+  java-runtime:
+    build:
+      dockerfile: Dockerfile
+    image: rooki-run
+
+    restart: always
+    working_dir: /runtime
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://192.168.16.2:5432/book_shelf
+      - SPRING_DATASOURCE_USERNAME=admin
+      - SPRING_DATASOURCE_PASSWORD=admin
+      - APP_BOOK_FILE_PATH=/storage
+    volumes:
+      - /tmp/storage:/storage
+    ports:
+      - 8080:8080
+    networks:
+      - local_net
+
+networks:
+  local_net:
+    external:
+      name: db_network
+
+
+
+
+    #- #    command:
+#      - 'mkdir /runtime'
+#      - 'mkdir /compile'
+#      - 'cp . /compile'
