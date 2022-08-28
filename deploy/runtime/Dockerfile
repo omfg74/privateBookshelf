@@ -1,7 +1,7 @@
-FROM ubuntu
+FROM openjdk:17
 
-RUN apt update
-RUN apt install openjdk-17-jdk -y
+#RUN apt update
+#RUN apt install openjdk-17-jdk -y
 
 VOLUME [ "/runtime" ]
 
