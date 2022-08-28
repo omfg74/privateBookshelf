@@ -31,9 +31,8 @@ services:
         ./gradlew clean
         ./gradlew bootJar
         cp build/libs/book-shelf.jar /tmp/runtime
-        cd /tmp/runtime
         chmod -R 777 /tmp/runtime
-        java -jar book-shelf
+        java -jar /tmp/runtime/book-shelf
         sleep 1000000
 
 
