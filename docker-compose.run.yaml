@@ -2,33 +2,70 @@ version: '3'
 
 services:
   java-runtime:
-    build:
-      dockerfile: Dockerfile
-    image: rooki-run
 
-    restart: always
-    working_dir: /runtime
+    build:
+      context: ./
+      dockerfile: Dockerfile
+
+    depends_on:
+      - postgres
+    #    restart: always
+    working_dir: /source
+
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://192.168.16.2:5432/book_shelf
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/book_shelf
       - SPRING_DATASOURCE_USERNAME=admin
       - SPRING_DATASOURCE_PASSWORD=admin
       - APP_BOOK_FILE_PATH=/storage
     volumes:
+      - ./:/source
       - /tmp/storage:/storage
     ports:
       - 8080:8080
-    networks:
-      - local_net
+    command:
+      - /bin/bash
+      - -c
+      - |
+        ./gradlew clean
+        ./gradlew bootJar
+        cp build/libs/book-shelf.jar /tmp/runtime
+        cd /tmp/runtime
+        java -jar book-shelf
 
-networks:
-  local_net:
-    external:
-      name: db_network
+  postgres:
+    image: postgres:14
+    restart: always
+    command:
+      - '-c'
+      - 'shared_buffers=256MB'
+      - '-c'
+      - 'max_connections=200'
+    environment:
+      POSTGRES_DB: book_shelf
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+    volumes:
+      - postgresql_data:/var/lib/postgresql/data
+    ports:
+      - 5433:5432
 
 
 
+  db_init:
+    image: liquibase/liquibase:4.5.0
+    depends_on:
+      postgres:
+        condition: service_started
+    volumes:
+      - ./src/main/resources/db/changelog:/liquibase/changelog
+    command:
+      - "update"
+      - "--url=jdbc:postgresql://postgres:5433/book_shelf"
+      - "--username=admin"
+      - "--password=admin"
+      - "--changeLogFile=db/changelog/db.changelog-master.xml"
 
-    #- #    command:
-#      - 'mkdir /runtime'
-#      - 'mkdir /compile'
-#      - 'cp . /compile'
+
+
+volumes:
+  postgresql_data:
