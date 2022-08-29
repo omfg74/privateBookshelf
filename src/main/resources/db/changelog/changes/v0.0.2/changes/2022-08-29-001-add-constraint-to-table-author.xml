@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog ../../../../libs/dbchangelog-3.6.xsd">
+    <changeSet id="2022-08-29-001-add-constraint-to-table-author.xml" author="a.podshivalov">
+
+        <sql>
+            ALTER TABLE author
+                ADD CONSTRAINT first_name_and_last_name_unique UNIQUE (first_name, last_name);
+
+            comment
+            on table author is 'Contains information about authors';
+
+            create index author_first_name_index
+                on author (first_name);
+
+            create index author_last_name_index
+                on author (last_name);
+
+            create index author_first_name_last_name_index
+                on author (first_name, last_name);
+
+
+        </sql>
+        <rollback>
+            drop index first_name_and_last_name_unique;
+
+            drop index author_first_name_index;
+
+            drop index author_last_name_index;
+
+            drop index author_first_name_last_name_index;
+
+            alter table author
+            drop constraint first_name_and_last_name_unique;
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

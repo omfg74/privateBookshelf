@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog ../../../../libs/dbchangelog-3.6.xsd">
+    <changeSet id="2022-08-29-004-add-constraint-to-table-book_to_genre.xml" author="a.podshivalov">
+
+        <sql>
+            comment
+            on table file is 'Contains information about relation books to genres';
+
+            alter table file
+                add constraint file_book_file_fk
+                    foreign key (book_id) references book
+                        on delete cascade;
+
+            create index file_book_id_index
+                on file (book_id);
+        </sql>
+        <rollback>
+            alter table file
+            drop foreign key file_book_file_fk;
+
+            drop index file_book_id_index;
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

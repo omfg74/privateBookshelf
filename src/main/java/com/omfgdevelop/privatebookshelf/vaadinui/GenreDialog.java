@@ -8,6 +8,7 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.H4;
+import com.vaadin.flow.component.html.H5;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
@@ -20,7 +21,7 @@ public class GenreDialog extends Dialog {
     private TextField genreNameTextFiled;
 
     private Button addBtn;
-    private final H4 comment = new H4();
+    private final H5 comment = new H5();
 
 
     public GenreDialog(GenreService genreService) {
@@ -30,27 +31,27 @@ public class GenreDialog extends Dialog {
     }
 
     private void createViews() {
+        comment.setVisible(false);
         genreNameTextFiled = new TextField();
         genreNameTextFiled.setLabel("Name");
         addBtn = new Button("Add");
-        addBtn.addClickListener(new ComponentEventListener<ClickEvent<Button>>() {
-            @Override
-            public void onComponentEvent(ClickEvent<Button> event) {
-                if (genreNameTextFiled.getValue().trim().isEmpty()) {
-                    genreNameTextFiled.setErrorMessage("Add genre name");
-                    genreNameTextFiled.setInvalid(true);
-                    return;
-                }
-                try {
-                    Genre genre = genreService.create(Genre.builder().name(genreNameTextFiled.getValue()).build());
-                    comment.setText("Success! Added " + genre.getName());
-                } catch (Exception e) {
-                    comment.setText(e.getMessage());
-                } finally {
-                    genreNameTextFiled.clear();
-                }
+        addBtn.addClickListener((ComponentEventListener<ClickEvent<Button>>) event -> {
+            if (genreNameTextFiled.getValue().trim().isEmpty()) {
+                genreNameTextFiled.setErrorMessage("Add genre name");
+                genreNameTextFiled.setInvalid(true);
+                comment.setVisible(false);
+                return;
             }
-
+            try {
+                Genre genre = genreService.create(Genre.builder().name(genreNameTextFiled.getValue()).build());
+                comment.setText("Success! Added " + genre.getName());
+                comment.setVisible(true);
+            } catch (Exception e) {
+                comment.setText(e.getMessage());
+                comment.setVisible(true);
+            } finally {
+                genreNameTextFiled.clear();
+            }
         });
     }
 

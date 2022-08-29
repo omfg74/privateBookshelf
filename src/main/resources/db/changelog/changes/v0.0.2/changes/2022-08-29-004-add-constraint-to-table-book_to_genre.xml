@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog ../../../../libs/dbchangelog-3.6.xsd">
+    <changeSet id="2022-08-29-004-add-constraint-to-table-book_to_genre.xml" author="a.podshivalov">
+
+        <sql>
+            comment
+            on table book_to_genre is 'Contains information about relation books to genres';
+
+            ALTER TABLE book_to_genre
+                ADD CONSTRAINT book_to_genre_unique UNIQUE (genre_id,book_id);
+
+            alter table book_to_genre
+                add constraint book_to_genre_book_fk
+                    foreign key (book_id) references book
+                        on delete cascade;
+
+            alter table book_to_genre
+                add constraint book_to_genre_genre_id_fk
+                    foreign key (genre_id) references genre
+                        on delete restrict;
+
+
+        </sql>
+        <rollback>
+            alter table book_to_genre
+            drop constraint book_to_genre_unique;
+
+            drop foreign key book_to_genre_genre_id_fk;
+            drop foreign key book_to_genre_book_fk;
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>
