@@ -9,7 +9,7 @@ services:
 
     depends_on:
       - postgres
-    #    restart: always
+    restart: always
     working_dir: /source
 
     environment:
@@ -19,7 +19,7 @@ services:
       - APP_BOOK_FILE_PATH=/storage
     volumes:
       - ./:/source
-      - /tmp/storage:/storage
+      - ${STORAGE}:/storage
     ports:
       - 8080:8080
     command:
@@ -33,8 +33,8 @@ services:
         cp build/libs/book-shelf.jar /tmp/runtime
         chmod -R 777 /tmp/runtime
         java -jar /tmp/runtime/book-shelf.jar
-        sleep 1000000
-
+  
+  
 
   postgres:
     image: postgres:14
@@ -56,19 +56,16 @@ services:
 
 
   db_init:
-    image: liquibase/liquibase:4.5.0
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    working_dir: /liquibase/db
     depends_on:
       postgres:
         condition: service_started
     volumes:
-      - ./src/main/resources/db/changelog:/liquibase/changelog
-    command:
-      - "update"
-      - "--url=jdbc:postgresql://postgres:5433/book_shelf"
-      - "--username=admin"
-      - "--password=admin"
-      - "--changeLogFile=db/changelog/db.changelog-master.xml"
-
+      - ./src/main/resources/db/:/liquibase/db
+    command: bash /liquibase/db/updateDockerDb.sh
 
 
 volumes:

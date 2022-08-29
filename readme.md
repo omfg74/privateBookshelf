@@ -2,46 +2,32 @@
 
 # Simple file storage to keep my e-book in order
 
-## 1. Deploy
+### 1. Develop database creation
 
-### 1.1 To deploy application this way it needs to be Docker installed
+#### 1.1 Docker
 
-#### 1.1.1 building deployment images
-then run docker ```docker build -t rooki-builder .``` from deploy/builder directory  
-then run docker ```docker build -t rooki-runtime .``` from deploy/runtime directory
- 
-then create runtime directory with file run.sh 
-it must contain text like ```!#/bin/bash \n java -jar -Denv.var=value <other values> book-shelf.jar```
+- Current developing database is configured to be run in docker. So it recommended to be installed.
+- Or you may use another database. Just replace ```spring.datasource.url``` value in application.properties file to your
+  db url.
 
-example
-```#!bin/bash```
+#### 1.2 Create/Recreate
 
-```java -jar  -Dapp.book.file_path=/tmp/books book-shelf.jar```
+- run db-recreate.sh from project directory
+- run src/main/resources/db/updateLocalDb.sh to create local
 
-#### 1.1.2 compiling project
-To run builder execute ```docker run -d --rm -v <source_dir>:/source -v <runtime_dir>:/runtime  rooki-builder :latest``` 
-example  ``` docker run -d --rm -v $(pwd):/source -v /tmp/runtime:/runtime  rooki-builder ```
-run runtime ```docker run -it --rm -v /tmp/runtime:/runtime rooki-runtime```
-#### 1.1.3 running compiled project
+### 2. Deploy
 
-## 1. Deploy
+#### 2.1 creating env variables
 
-### 1.1 To deploy application this way it needs to be Docker installed
+- simply create .env file in project dir and place there all variables you need. Example ```ENV_VAR=FOO```. Or copy them
+  from env_example
 
-#### 1.1.1 building deployment images
-then run docker ```docker build -t rooki-builder .``` from deploy/builder directory  
-then run docker ```docker build -t rooki-runtime .``` from deploy/runtime directory
- 
-then create runtime directory with file run.sh 
-it must contain text like ```!#/bin/bash \n java -jar -Denv.var=value <other values> book-shelf.jar```
+#### 2.2 build and run
 
-example
-```#!bin/bash```
+- run deploy.sh from command line.
+- that`s all.
 
-```java -jar  -Dapp.book.file_path=/tmp/books book-shelf.jar```
+#### 2.3 Database
 
-#### 1.1.2 compiling project
-To run builder execute ```docker run -d --rm -v <source_dir>:/source -v <runtime_dir>:/runtime  rooki-builder :latest``` 
-example  ``` docker run -d --rm -v $(pwd):/source -v /tmp/runtime:/runtime  rooki-builder ```
-
-#### 1.1.3 running compiled project
+- Deployment database may conflict with developing one. Change database settings in docker-compose.run.yaml or docker-compose.yaml if you need to run them both.
+- Do not forget to change application db settings if you decided to do it  

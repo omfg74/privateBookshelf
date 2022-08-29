@@ -1,0 +1,5 @@
+SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/book_shelf
+SPRING_DATASOURCE_USERNAME=admin
+SPRING_DATASOURCE_PASSWORD=admin
+APP_BOOK_FILE_PATH=/storage
+STORAGE=/tmp/storage
