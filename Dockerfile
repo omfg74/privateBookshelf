@@ -1,20 +1,20 @@
-FROM openjdk:17
-VOLUME ['/runtime']
-VOLUME ['/storage']
-RUN microdnf install findutils
-RUN mkdir runtime
-COPY . /runtime
-RUN cd /runtime &&  ./gradlew bootJar
-RUN cp /runtime/build/libs/book-shelf.jar /runtime
-WORKDIR /runtime
+FROM ubuntu
 
-EXPOSE 8080
+RUN apt update && apt install openjdk-17-jdk -y
 
-ENV SPRING_DATASOURCE_URL=$SPRING_DATASOURCE_URL \
-    SPRING_DATASOURCE_USERNAME=$SPRING_DATASOURCE_USERNAME \
-    SPRING_DATASOURCE_PASSWORD=$SPRING_DATASOURCE_PASSWORD
-
-
-ENTRYPOINT exec java $JVM_ARGS \
-        -Dfile.encoding=utf-8 \
-        -jar /runtime/book-shelf.jar
+#VOLUME ['/storage']
+#VOLUME ['/storage']
+##RUN #microdnf install findutils
+#ENV LANG=en_US.UTF-8 \
+#    LANGUAGE=en_US:en \
+#    LC_ALL=en_US.UTF-8
+#
+#RUN mkdir runtime
+#RUN mkdir /compile
+#COPY . /compile
+#RUN cd /compile &&  ./gradlew clean
+#RUN #cd /compile &&  ./gradlew rm -rf node_modules
+#RUN cd /compile &&  ./gradlew bootJar
+#RUN cp /compile/build/libs/book-shelf.jar /runtime
+#RUN chmod -R 777 /runtime
+#

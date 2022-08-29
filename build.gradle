@@ -1,5 +1,5 @@
 plugins {
-    id 'org.springframework.boot' version '2.5.4'
+    id 'org.springframework.boot' version '2.6.4'
     id 'io.spring.dependency-management' version '1.0.12.RELEASE'
     id 'com.vaadin' version '23.1.2'
     id 'java'
@@ -76,9 +76,9 @@ tasks.named('test') {
 
 bootJar{
     archiveName = "book-shelf.jar"
-    mainClassName = "com.omfgdevelop.privatebookshelf.PrivatebookshelfApplication"
+//    mainClassName = "com.omfgdevelop.privatebookshelf.PrivatebookshelfApplication"
 
-    manifest {
-        attributes 'Implementation-Title': "${title}"
-    }
+//    manifest {
+//        attributes 'Implementation-Title': "${title}"
+//    }
 }
