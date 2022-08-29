@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog ../../../../libs/dbchangelog-3.6.xsd">
+    <changeSet id="2022-08-29-002-add-constraint-to-table-book.xml" author="a.podshivalov">
+
+        <sql>
+            comment
+            on table book is 'Contains information about books';
+
+            ALTER TABLE book
+                ADD CONSTRAINT book_name_unique UNIQUE (name);
+
+            alter table book
+            drop
+            column author_id;
+        </sql>
+        <rollback>
+            alter table book
+            drop constraint book_name_unique;
+
+            alter table book
+            add column author_id;
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

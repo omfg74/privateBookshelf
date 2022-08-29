@@ -3,10 +3,7 @@ package com.omfgdevelop.privatebookshelf.vaadinui;
 
 import com.omfgdevelop.privatebookshelf.domain.Author;
 import com.omfgdevelop.privatebookshelf.service.AuthorService;
-import com.vaadin.flow.component.AbstractField;
-import com.vaadin.flow.component.ClickEvent;
-import com.vaadin.flow.component.ComponentEventListener;
-import com.vaadin.flow.component.HasValue;
+import com.vaadin.flow.component.*;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
@@ -14,6 +11,7 @@ import com.vaadin.flow.component.html.H4;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
+import org.hibernate.exception.ConstraintViolationException;
 
 
 /**
@@ -38,28 +36,41 @@ public class AuthorDialog extends Dialog {
     }
 
     private void createViews() {
+        comment.setVisible(false);
         authorNameTextField = new TextField();
         authorNameTextField.setLabel("Author first name");
+
         authorNameTextField.addValueChangeListener((HasValue.ValueChangeListener<AbstractField.ComponentValueChangeEvent<TextField, String>>) event -> {
             authorNameTextField.setInvalid(false);
             authorNameTextField.setErrorMessage(null);
+            comment.setVisible(false);
         });
+        authorNameTextField.addFocusListener((ComponentEventListener<FocusNotifier.FocusEvent<TextField>>) event -> {
+            authorNameTextField.setInvalid(false);
+            authorNameTextField.setErrorMessage(null);
+            comment.setVisible(false);
+        });
+
         authorLastNameTextField = new TextField();
         authorLastNameTextField.setLabel("Author last name");
 
-        authorLastNameTextField.addValueChangeListener(new HasValue.ValueChangeListener<AbstractField.ComponentValueChangeEvent<TextField, String>>() {
-            @Override
-            public void valueChanged(AbstractField.ComponentValueChangeEvent<TextField, String> event) {
-                authorLastNameTextField.setInvalid(false);
-                authorLastNameTextField.setErrorMessage(null);
-            }
+        authorLastNameTextField.addValueChangeListener((HasValue.ValueChangeListener<AbstractField.ComponentValueChangeEvent<TextField, String>>) event -> {
+            authorLastNameTextField.setInvalid(false);
+            authorLastNameTextField.setErrorMessage(null);
+            comment.setVisible(false);
         });
+
+        authorLastNameTextField.addFocusListener((ComponentEventListener<FocusNotifier.FocusEvent<TextField>>) event -> {
+            authorLastNameTextField.setInvalid(false);
+            authorLastNameTextField.setErrorMessage(null);
+            comment.setVisible(false);
+        });
+
         okBtn = new Button("Add");
         okBtn.addClickListener((ComponentEventListener<ClickEvent<Button>>) event -> {
             if (authorNameTextField.getValue().trim().isEmpty()) {
                 authorNameTextField.setErrorMessage("Enter author first name");
                 authorNameTextField.setInvalid(true);
-
                 return;
             }
             if (authorLastNameTextField.getValue().trim().isEmpty()) {
@@ -72,8 +83,13 @@ public class AuthorDialog extends Dialog {
                 comment.setText("Success! Added " + author.getFirstName() + " " + author.getLastName());
                 authorNameTextField.clear();
                 authorLastNameTextField.clear();
-            } catch (Exception e) {
+                comment.setVisible(true);
+            }catch (org.springframework.dao.DataIntegrityViolationException e){
+                comment.setText("This author already exists");
+                comment.setVisible(true);
+            }catch (Exception e) {
                 comment.setText(e.getMessage());
+                comment.setVisible(true);
             }
         });
 

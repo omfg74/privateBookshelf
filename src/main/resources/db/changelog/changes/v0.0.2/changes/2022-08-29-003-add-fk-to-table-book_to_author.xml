@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog ../../../../libs/dbchangelog-3.6.xsd">
+    <changeSet id="2022-08-29-003-add-fk-to-table-book_to_author.xml" author="a.podshivalov">
+
+        <sql>
+            comment
+            on table book_to_author is 'Contains information about relation books to authors';
+
+            ALTER TABLE book_to_author
+                ADD CONSTRAINT book_to_author_unique UNIQUE (author_id,book_id);
+
+            alter table book_to_author
+                add constraint book_to_author__book_fk
+                    foreign key (book_id) references book
+                        on delete cascade;
+
+            alter table book_to_author
+                add constraint book_to_author_author_id_fk
+                    foreign key (author_id) references author
+                        on delete restrict;
+
+
+        </sql>
+        <rollback>
+            alter table book_to_author
+            drop constraint book_to_author_unique;
+
+            drop foreign key book_to_author__book_fk;
+            drop foreign key book_to_author_author_id_fk;
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

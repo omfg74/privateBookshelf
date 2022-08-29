@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog ../../../libs/dbchangelog-3.6.xsd">
+
+    <include file="changes/2022-08-29-001-add-constraint-to-table-author.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2022-08-29-002-add-constraint-to-table-book.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2022-08-29-003-add-fk-to-table-book_to_author.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2022-08-29-004-add-constraint-to-table-book_to_genre.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2022-08-29-005-add-fk-to-table-file.xml" relativeToChangelogFile="true"/>
+    <include file="changes/2022-08-29-006-add-fk-to-table-genre.xml" relativeToChangelogFile="true"/>
+
+</databaseChangeLog>
