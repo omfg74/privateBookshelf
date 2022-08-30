@@ -17,6 +17,7 @@ services:
       - SPRING_DATASOURCE_USERNAME=admin
       - SPRING_DATASOURCE_PASSWORD=admin
       - APP_BOOK_FILE_PATH=/storage
+      - APP_VERSION=$(git describe --abbrev=0 --tags)
     volumes:
       - ./:/source
       - ${STORAGE}:/storage

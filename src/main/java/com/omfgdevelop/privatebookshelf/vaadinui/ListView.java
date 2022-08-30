@@ -4,25 +4,19 @@ import com.omfgdevelop.privatebookshelf.domain.Book;
 import com.omfgdevelop.privatebookshelf.domain.BookFilter;
 import com.omfgdevelop.privatebookshelf.domain.Genre;
 import com.omfgdevelop.privatebookshelf.exception.BusinessException;
-import com.omfgdevelop.privatebookshelf.service.AuthorService;
-import com.omfgdevelop.privatebookshelf.service.BookService;
-import com.omfgdevelop.privatebookshelf.service.FileProcessingService;
-import com.omfgdevelop.privatebookshelf.service.GenreService;
+import com.omfgdevelop.privatebookshelf.service.*;
 import com.omfgdevelop.privatebookshelf.utils.DataProviderFactory;
 import com.omfgdevelop.privatebookshelf.utils.FilterService;
 import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEventListener;
-import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.CallbackDataProvider;
 import com.vaadin.flow.data.provider.ConfigurableFilterDataProvider;
@@ -36,7 +30,6 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.StreamResource;
 import org.springframework.data.domain.Page;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.function.Function;
 
@@ -61,13 +54,15 @@ public class ListView extends VerticalLayout {
 
     private final FilterService filterService;
 
+    private final VersionService versionService;
 
-    public ListView(BookService bookService, FileProcessingService fileProcessingService, AuthorService authorService, GenreService genreService, DataProviderFactory dataProviderFactory, FilterService filterService) throws BusinessException {
+    public ListView(BookService bookService, FileProcessingService fileProcessingService, AuthorService authorService, GenreService genreService, DataProviderFactory dataProviderFactory, FilterService filterService, VersionService versionService) throws BusinessException {
         this.bookService = bookService;
         this.fileProcessingService = fileProcessingService;
         this.authorService = authorService;
         this.genreService = genreService;
         this.filterService = filterService;
+        this.versionService = versionService;
         addClassName("book-create-dialog");
         setSizeFull();
 
@@ -78,7 +73,7 @@ public class ListView extends VerticalLayout {
         add(getToolbar(), grid);
         var versionLayout = new HorizontalLayout();
         versionLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.END);
-        versionLayout.add(getVersion());
+        versionLayout.add(versionService.getVersion());
         versionLayout.setWidthFull();
         versionLayout.setSpacing(true);
         add(versionLayout);
@@ -86,17 +81,17 @@ public class ListView extends VerticalLayout {
 
     }
 
-    private Span getVersion() {
-//        Text version = new Text("");
-        Span version = new Span("");
-        version.getElement().getThemeList().add("badge");
-        try {
-            version.setText( Utils.getVersion());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        return version;
-    }
+//    private Span getVersion() {
+////        Text version = new Text("");
+//        Span version = new Span("");
+//        version.getElement().getThemeList().add("badge");
+//        try {
+//            version.setText( Utils.getVersion());
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
+//        return version;
+//    }
 
 
     private Button createAuthorDialogButton() {
