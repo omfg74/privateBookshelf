@@ -46,11 +46,14 @@ public class GenreDialog extends Dialog {
                 Genre genre = genreService.create(Genre.builder().name(genreNameTextFiled.getValue()).build());
                 comment.setText("Success! Added " + genre.getName());
                 comment.setVisible(true);
-            } catch (Exception e) {
-                comment.setText(e.getMessage());
-                comment.setVisible(true);
-            } finally {
                 genreNameTextFiled.clear();
+            } catch (org.springframework.dao.DataIntegrityViolationException e) {
+                comment.setText("This genre already exists");
+                genreNameTextFiled.setInvalid(true);
+                comment.setVisible(true);
+            } catch (Exception e) {
+                comment.setText("Unexpected error while adding genre");
+                comment.setVisible(true);
             }
         });
     }
