@@ -72,7 +72,7 @@ public class ListView extends VerticalLayout {
         configureGrid();
         add(getToolbar(), grid);
         var versionLayout = new HorizontalLayout();
-        versionLayout.setJustifyContentMode(JustifyContentMode.END);
+        versionLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.END);
         versionLayout.add(versionService.getVersion());
         versionLayout.setWidthFull();
         versionLayout.setSpacing(true);
