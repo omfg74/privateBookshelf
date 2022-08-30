@@ -55,8 +55,6 @@ public class UploadDialog extends Dialog {
     ComboBox<Author> authorComboBox;
     MultiselectComboBox<Genre> genreComboBox;
     private final DataProvider<Author, String> authorProvider;
-    private final DataProvider<Genre, String> genreProvider;
-
     private final Set<Genre> selectedGenres = new HashSet<>();
 
 
@@ -69,7 +67,6 @@ public class UploadDialog extends Dialog {
         this.setHeaderTitle("Upload book");
 
         authorProvider = getAuthorProvider();
-        genreProvider = getGenreProvider();
 
         okBtn = addOkBtn();
         bookName = createBookNameTextField();
@@ -120,13 +117,13 @@ public class UploadDialog extends Dialog {
         try {
             bookFile = fileProcessingService.createBookFile(fileData, fileName, mimeType, contentLength);
         } catch (IOException e) {
-            Notification.show("Unexpected error");
+            ComponentProvider.getErrorNotification("Unexpected Error");
             throw new RuntimeException(e);
         } finally {
             try {
                 fileData.close();
             } catch (IOException e) {
-                Notification.show("Unexpected error");
+                ComponentProvider.getErrorNotification("Unexpected Error");
                 throw new RuntimeException(e);
             }
         }
@@ -138,7 +135,7 @@ public class UploadDialog extends Dialog {
 
 
         if (bookFile == null) {
-            Notification.show("File not uploaded");
+            ComponentProvider.getErrorNotification("File not uploaded");
         }
 
         if (errors.contains(BOOK_NAME_IS_NOT_SET)) {
@@ -165,18 +162,18 @@ public class UploadDialog extends Dialog {
                         .files(Collections.singletonList(bookFile))
                         .build();
                 bookService.create(book);
-                Notification.show("New Book created! ");
+                ComponentProvider.getSuccessNotification(String.format("Book added %s!", book.getName()));
 
                 close();
             }
         } catch (org.springframework.dao.DataIntegrityViolationException e) {
-            Notification.show("Book already exists");
+            ComponentProvider.getErrorNotification("Book already exists");
             throw new RuntimeException(e);
         } catch (BusinessException e) {
-            Notification.show(e.getMessage());
+            ComponentProvider.getErrorNotification(e.getMessage());
             throw new RuntimeException(e);
         } catch (Exception e) {
-            Notification.show("Unexpected error");
+            ComponentProvider.getErrorNotification("Unexpected Error");
             throw new RuntimeException(e);
         }
     }

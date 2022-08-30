@@ -1,6 +1,8 @@
 package com.omfgdevelop.privatebookshelf.vaadinui;
 
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.notification.NotificationVariant;
 import org.springframework.stereotype.Service;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 
@@ -27,13 +29,19 @@ public class ComponentProvider {
             dialog.close();
         });
 
-//        Button button = new Button("Open confirm dialog");
-//        button.addClickListener(event -> {
-//            dialog.open();
-//
-//        });
         return dialog;
-
     }
 
+
+    public static void getSuccessNotification(String text) {
+        Notification notification = Notification.show(text);
+        notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+        notification.setPosition(Notification.Position.TOP_CENTER);
+    }
+
+    public static void getErrorNotification(String text) {
+        Notification notification = Notification.show(text);
+        notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+        notification.setPosition(Notification.Position.TOP_CENTER);
+    }
 }

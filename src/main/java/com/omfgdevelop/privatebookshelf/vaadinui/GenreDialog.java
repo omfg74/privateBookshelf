@@ -21,7 +21,6 @@ public class GenreDialog extends Dialog {
     private TextField genreNameTextFiled;
 
     private Button addBtn;
-    private final H5 comment = new H5();
 
 
     public GenreDialog(GenreService genreService) {
@@ -31,7 +30,6 @@ public class GenreDialog extends Dialog {
     }
 
     private void createViews() {
-        comment.setVisible(false);
         genreNameTextFiled = new TextField();
         genreNameTextFiled.setLabel("Name");
         addBtn = new Button("Add");
@@ -39,21 +37,19 @@ public class GenreDialog extends Dialog {
             if (genreNameTextFiled.getValue().trim().isEmpty()) {
                 genreNameTextFiled.setErrorMessage("Add genre name");
                 genreNameTextFiled.setInvalid(true);
-                comment.setVisible(false);
                 return;
             }
             try {
                 Genre genre = genreService.create(Genre.builder().name(genreNameTextFiled.getValue()).build());
-                comment.setText("Success! Added " + genre.getName());
-                comment.setVisible(true);
+
+                ComponentProvider.getSuccessNotification(String.format("Success! new genre %s added!", genre.getName()));
+
                 genreNameTextFiled.clear();
             } catch (org.springframework.dao.DataIntegrityViolationException e) {
-                comment.setText("This genre already exists");
+                ComponentProvider.getErrorNotification("This genre already exists");
                 genreNameTextFiled.setInvalid(true);
-                comment.setVisible(true);
             } catch (Exception e) {
-                comment.setText("Unexpected error while adding genre");
-                comment.setVisible(true);
+                ComponentProvider.getErrorNotification("Unexpected error while adding genre");
             }
         });
     }
@@ -62,7 +58,6 @@ public class GenreDialog extends Dialog {
         this.getHeader().add(addCloseBtn());
         this.setHeaderTitle("New genre");
         var verticalLayout = new VerticalLayout();
-        verticalLayout.add(comment);
         verticalLayout.add(genreNameTextFiled);
         verticalLayout.add(addBtn);
         this.add(verticalLayout);

@@ -25,7 +25,6 @@ public class AuthorDialog extends Dialog {
     private Button okBtn;
     private final AuthorService authorService;
 
-    private final H4 comment = new H4();
 
     public AuthorDialog(AuthorService authorService) {
         this.authorService = authorService;
@@ -36,19 +35,16 @@ public class AuthorDialog extends Dialog {
     }
 
     private void createViews() {
-        comment.setVisible(false);
         authorNameTextField = new TextField();
         authorNameTextField.setLabel("Author first name");
 
         authorNameTextField.addValueChangeListener((HasValue.ValueChangeListener<AbstractField.ComponentValueChangeEvent<TextField, String>>) event -> {
             authorNameTextField.setInvalid(false);
             authorNameTextField.setErrorMessage(null);
-            comment.setVisible(false);
         });
         authorNameTextField.addFocusListener((ComponentEventListener<FocusNotifier.FocusEvent<TextField>>) event -> {
             authorNameTextField.setInvalid(false);
             authorNameTextField.setErrorMessage(null);
-            comment.setVisible(false);
         });
 
         authorLastNameTextField = new TextField();
@@ -57,13 +53,11 @@ public class AuthorDialog extends Dialog {
         authorLastNameTextField.addValueChangeListener((HasValue.ValueChangeListener<AbstractField.ComponentValueChangeEvent<TextField, String>>) event -> {
             authorLastNameTextField.setInvalid(false);
             authorLastNameTextField.setErrorMessage(null);
-            comment.setVisible(false);
         });
 
         authorLastNameTextField.addFocusListener((ComponentEventListener<FocusNotifier.FocusEvent<TextField>>) event -> {
             authorLastNameTextField.setInvalid(false);
             authorLastNameTextField.setErrorMessage(null);
-            comment.setVisible(false);
         });
 
         okBtn = new Button("Add");
@@ -80,16 +74,16 @@ public class AuthorDialog extends Dialog {
             }
             try {
                 Author author = authorService.create(Author.builder().firstName(authorNameTextField.getValue()).lastName(authorLastNameTextField.getValue()).build());
-                comment.setText("Success! Added " + author.getFirstName() + " " + author.getLastName());
+
+                ComponentProvider.getSuccessNotification(String.format("Success! %s %s added!",  author.getFirstName() , author.getLastName()));
                 authorNameTextField.clear();
                 authorLastNameTextField.clear();
-                comment.setVisible(true);
+
             }catch (org.springframework.dao.DataIntegrityViolationException e){
-                comment.setText("This author already exists");
-                comment.setVisible(true);
+                ComponentProvider.getErrorNotification("This author already exists");
             }catch (Exception e) {
-                comment.setText(e.getMessage());
-                comment.setVisible(true);
+                ComponentProvider.getErrorNotification("Unexpected error.");
+                throw new RuntimeException(e);
             }
         });
 
@@ -99,7 +93,7 @@ public class AuthorDialog extends Dialog {
     private void addViews() {
         this.getHeader().add(addCloseBtn());
         var verticalLayout = new VerticalLayout();
-        verticalLayout.add(comment);
+
         verticalLayout.add(authorNameTextField);
         verticalLayout.add(authorLastNameTextField);
         verticalLayout.add(okBtn);

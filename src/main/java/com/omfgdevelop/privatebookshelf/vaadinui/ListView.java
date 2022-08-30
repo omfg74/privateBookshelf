@@ -13,13 +13,16 @@ import com.omfgdevelop.privatebookshelf.utils.FilterService;
 import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEventListener;
+import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
-import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.CallbackDataProvider;
 import com.vaadin.flow.data.provider.ConfigurableFilterDataProvider;
@@ -33,8 +36,8 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.StreamResource;
 import org.springframework.data.domain.Page;
 
+import java.io.IOException;
 import java.util.Arrays;
-import java.util.List;
 import java.util.function.Function;
 
 
@@ -73,8 +76,28 @@ public class ListView extends VerticalLayout {
 
         configureGrid();
         add(getToolbar(), grid);
+        var versionLayout = new HorizontalLayout();
+        versionLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.END);
+        versionLayout.add(getVersion());
+        versionLayout.setWidthFull();
+        versionLayout.setSpacing(true);
+        add(versionLayout);
+
 
     }
+
+    private Span getVersion() {
+//        Text version = new Text("");
+        Span version = new Span("");
+        version.getElement().getThemeList().add("badge");
+        try {
+            version.setText( Utils.getVersion());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return version;
+    }
+
 
     private Button createAuthorDialogButton() {
         return new Button("Add new author", e -> {
@@ -105,6 +128,7 @@ public class ListView extends VerticalLayout {
         toolbar.add(createUploadButton());
         toolbar.add(createAuthorDialogButton());
         toolbar.add(createGenreDialogButton());
+
         return toolbar;
     }
 
