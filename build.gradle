@@ -17,7 +17,7 @@ configurations {
     }
 }
 
-ext{
+ext {
     title = "BOOK.SHELF"
 }
 
@@ -41,6 +41,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'com.vaadin:vaadin-spring-boot-starter:23.1.6'
     implementation 'org.vaadin.gatanaso:multiselect-combo-box-flow:4.0.0-rc2'
+    implementation 'com.vaadin:vaadin-confirm-dialog-flow:23.1.6'
+
 
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'org.postgresql:postgresql'
@@ -74,7 +76,7 @@ tasks.named('test') {
     useJUnitPlatform()
 }
 
-bootJar{
+bootJar {
     archiveName = "book-shelf.jar"
 //    mainClassName = "com.omfgdevelop.privatebookshelf.PrivatebookshelfApplication"
 

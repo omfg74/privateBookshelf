@@ -21,6 +21,7 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.dialog.Dialog;
+import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
@@ -126,7 +127,6 @@ public class UploadDialog extends Dialog {
                 fileData.close();
             } catch (IOException e) {
                 Notification.show("Unexpected error");
-                e.printStackTrace();
                 throw new RuntimeException(e);
             }
         }
@@ -189,7 +189,7 @@ public class UploadDialog extends Dialog {
     }
 
     private Button addCloseBtn() {
-        Button closeButton = new Button("Close", (e) -> this.close());
+        Button closeButton = new Button(new Icon("lumo", "cross"), (e) -> this.close());
         closeButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
         return closeButton;
     }

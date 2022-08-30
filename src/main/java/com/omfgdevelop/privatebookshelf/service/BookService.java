@@ -114,4 +114,11 @@ public class BookService {
     public int count(BookFilter filter) {
         return (int) bookRepository.count(getWhereClose(filter));
     }
+
+    public void deleteBooks(List<Book> bookList) {
+        bookRepository.deleteAll(bookList.stream().map(mapper::map).toList());
+    }
+    public void delete(Book book) {
+        bookRepository.delete(mapper.map(book));
+    }
 }
