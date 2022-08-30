@@ -25,6 +25,7 @@ services:
       - VAADIN_SERVLET_PRODUCTIONMODE=${VAADIN_SERVLET_PRODUCTIONMODE}
       - VAADIN_SERVLET_HEARTBEATINTERVAL=${VAADIN_SERVLET_HEARTBEATINTERVAL}
       - VAADIN_SERVLET_CLOSEIDLESESSIONS=${VAADIN_SERVLET_CLOSEIDLESESSIONS}
+      - VAADIN_PRODUCTIONMODE=${VAADIN_PRODUCTIONMODE}
     volumes:
       - ./:/source
       - ${STORAGE}:/storage
@@ -38,6 +39,8 @@ services:
         rm -rf node_modules
         chmod -R 777 /tmp/runtime
         ./gradlew clean
+        ./gradlew vaadinPrepareFrontend
+        ./gradlew vaadinBuildFrontend
         ./gradlew bootJar
         cp build/libs/book-shelf.jar /tmp/runtime
         chmod -R 777 /tmp/runtime
