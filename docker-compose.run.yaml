@@ -13,11 +13,18 @@ services:
     working_dir: /source
 
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/book_shelf
-      - SPRING_DATASOURCE_USERNAME=admin
-      - SPRING_DATASOURCE_PASSWORD=admin
-      - APP_BOOK_FILE_PATH=/storage
-      - APP_VERSION=$(git describe --abbrev=0 --tags)
+      - SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL}
+      - SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
+      - APP_BOOK_FILE_PATH=${APP_BOOK_FILE_PATH}
+      - APP_VERSION=${APP_VERSION}
+      - COM_SUN_MANAGEMENT_JMXREMOTE_PORT=${COM_SUN_MANAGEMENT_JMXREMOTE_PORT}
+      - COM_SUN_MANAGEMENT_JMXREMOTE_SSL=${COM_SUN_MANAGEMENT_JMXREMOTE_SSL}
+      - COM_SUN_MANAGEMENT_JMXREMOTE_AUTHENTICATE=${COM_SUN_MANAGEMENT_JMXREMOTE_AUTHENTICATE}
+      - JAVA_RMI_SERVER_HOSTNAME=${JAVA_RMI_SERVER_HOSTNAME}
+      - VAADIN_SERVLET_PRODUCTIONMODE=${VAADIN_SERVLET_PRODUCTIONMODE}
+      - VAADIN_SERVLET_HEARTBEATINTERVAL=${VAADIN_SERVLET_HEARTBEATINTERVAL}
+      - VAADIN_SERVLET_CLOSEIDLESESSIONS=${VAADIN_SERVLET_CLOSEIDLESESSIONS}
     volumes:
       - ./:/source
       - ${STORAGE}:/storage
@@ -28,12 +35,13 @@ services:
       - -c
       - |
         mkdir /tmp/runtime
+        rm -rf node_modules
         chmod -R 777 /tmp/runtime
         ./gradlew clean
         ./gradlew bootJar
         cp build/libs/book-shelf.jar /tmp/runtime
         chmod -R 777 /tmp/runtime
-        java -jar /tmp/runtime/book-shelf.jar
+        java -jar  /tmp/runtime/book-shelf.jar
   
   
 
