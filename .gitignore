@@ -36,3 +36,15 @@ out/
 
 ### VS Code ###
 .vscode/
+/package.json
+/webpack.config.js
+/webpack.generated.js
+/src/main/resources/tmp/
+/.dockerignore
+
+
+src/main/resources/tmp/storage/bookshelf
+/package-lock.json
+/frontend/
+/lib/
+/.env

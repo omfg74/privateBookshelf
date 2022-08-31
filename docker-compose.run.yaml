@@ -1,0 +1,84 @@
+version: '3'
+
+services:
+  java-runtime:
+
+    build:
+      context: ./
+      dockerfile: Dockerfile
+
+    depends_on:
+      - postgres
+    restart: always
+    working_dir: /source
+
+    environment:
+      - SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL}
+      - SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
+      - APP_BOOK_FILE_PATH=${APP_BOOK_FILE_PATH}
+      - APP_VERSION=${APP_VERSION}
+      - COM_SUN_MANAGEMENT_JMXREMOTE_PORT=${COM_SUN_MANAGEMENT_JMXREMOTE_PORT}
+      - COM_SUN_MANAGEMENT_JMXREMOTE_SSL=${COM_SUN_MANAGEMENT_JMXREMOTE_SSL}
+      - COM_SUN_MANAGEMENT_JMXREMOTE_AUTHENTICATE=${COM_SUN_MANAGEMENT_JMXREMOTE_AUTHENTICATE}
+      - JAVA_RMI_SERVER_HOSTNAME=${JAVA_RMI_SERVER_HOSTNAME}
+      - VAADIN_SERVLET_PRODUCTIONMODE=${VAADIN_SERVLET_PRODUCTIONMODE}
+      - VAADIN_SERVLET_HEARTBEATINTERVAL=${VAADIN_SERVLET_HEARTBEATINTERVAL}
+      - VAADIN_SERVLET_CLOSEIDLESESSIONS=${VAADIN_SERVLET_CLOSEIDLESESSIONS}
+      - VAADIN_PRODUCTIONMODE=${VAADIN_PRODUCTIONMODE}
+    volumes:
+      - ./:/source
+      - ${STORAGE}:/storage
+    ports:
+      - 8080:8080
+    command:
+      - /bin/bash
+      - -c
+      - |
+        mkdir /tmp/runtime
+        rm -rf node_modules
+        chmod -R 777 /tmp/runtime
+        ./gradlew clean
+        ./gradlew vaadinPrepareFrontend
+        ./gradlew vaadinBuildFrontend
+        ./gradlew bootJar
+        cp build/libs/book-shelf.jar /tmp/runtime
+        chmod -R 777 /tmp/runtime
+        java -jar  /tmp/runtime/book-shelf.jar
+  
+  
+
+  postgres:
+    image: postgres:14
+    restart: always
+    command:
+      - '-c'
+      - 'shared_buffers=256MB'
+      - '-c'
+      - 'max_connections=200'
+    environment:
+      POSTGRES_DB: book_shelf
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+    volumes:
+      - postgresql_data:/var/lib/postgresql/data
+    ports:
+      - 5433:5432
+
+
+
+  db_init:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    working_dir: /liquibase/db
+    depends_on:
+      postgres:
+        condition: service_started
+    volumes:
+      - ./src/main/resources/db/:/liquibase/db
+    command: bash /liquibase/db/updateDockerDb.sh  ${SPRING_DATASOURCE_URL}  ${SPRING_DATASOURCE_USERNAME}  ${SPRING_DATASOURCE_PASSWORD}
+
+
+volumes:
+  postgresql_data:

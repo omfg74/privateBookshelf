@@ -16,6 +16,11 @@ services:
       - postgresql_data:/var/lib/postgresql/data
     ports:
       - 5433:5432
+    networks:
+      - db_network
+networks:
+  db_network:
+    external: true
 
 volumes:
   postgresql_data:
