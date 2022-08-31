@@ -1,20 +1,9 @@
-FROM ubuntu
+FROM debian
 
+RUN apt update
+RUN apt install sudo -y
+RUN apt install curl -y
+RUN curl -sL https://deb.nodesource.com/setup_16.x | sudo bash -
+RUN apt update
+RUN apt -y install nodejs
 RUN apt update && apt install openjdk-17-jdk -y
-
-#VOLUME ['/storage']
-#VOLUME ['/storage']
-##RUN #microdnf install findutils
-#ENV LANG=en_US.UTF-8 \
-#    LANGUAGE=en_US:en \
-#    LC_ALL=en_US.UTF-8
-#
-#RUN mkdir runtime
-#RUN mkdir /compile
-#COPY . /compile
-#RUN cd /compile &&  ./gradlew clean
-#RUN #cd /compile &&  ./gradlew rm -rf node_modules
-#RUN cd /compile &&  ./gradlew bootJar
-#RUN cp /compile/build/libs/book-shelf.jar /runtime
-#RUN chmod -R 777 /runtime
-#

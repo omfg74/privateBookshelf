@@ -37,9 +37,10 @@ services:
       - |
         mkdir /tmp/runtime
         rm -rf node_modules
+        rm -rf frontend
         chmod -R 777 /tmp/runtime
         ./gradlew clean
-        ./gradlew vaadinPrepareFrontend
+        ./gradlew vaadinClean
         ./gradlew vaadinBuildFrontend
         ./gradlew bootJar
         cp build/libs/book-shelf.jar /tmp/runtime
@@ -73,8 +74,7 @@ services:
       dockerfile: Dockerfile
     working_dir: /liquibase/db
     depends_on:
-      postgres:
-        condition: service_started
+      - postgres
     volumes:
       - ./src/main/resources/db/:/liquibase/db
     command: bash /liquibase/db/updateDockerDb.sh  ${SPRING_DATASOURCE_URL}  ${SPRING_DATASOURCE_USERNAME}  ${SPRING_DATASOURCE_PASSWORD}
