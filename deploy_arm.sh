@@ -1,3 +1,6 @@
+if [[ "$(docker images -q runtime 2> /dev/null)" == "" ]]; then
+  docker build -t runtime deploy/.
+fi
 ./gradlew clean
 ./gradlew vaadinClean
 ./gradlew vaadinBuildFrontend
