@@ -6,6 +6,7 @@ services:
     build:
       context: ./
       dockerfile: Dockerfile
+    container_name: java-runtime
     depends_on:
       - postgres
     restart: always
@@ -57,7 +58,7 @@ services:
   db_init:
     build:
       context: ./
-      dockerfile: Dockerfile
+    image: runtime
     working_dir: /liquibase/db
     depends_on:
       - postgres
