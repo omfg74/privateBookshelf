@@ -4,6 +4,7 @@ plugins {
     id 'com.vaadin' version '23.1.2'
     id 'java'
     id 'groovy'
+    id "com.moowork.node" version "1.3.1"
 
 }
 
@@ -43,7 +44,6 @@ dependencies {
     implementation 'org.vaadin.gatanaso:multiselect-combo-box-flow:4.0.0-rc2'
     implementation 'com.vaadin:vaadin-confirm-dialog-flow:23.1.6'
     implementation 'com.vaadin:flow-server-production-mode:23.1.6'
-
 
 
     compileOnly 'org.projectlombok:lombok'
