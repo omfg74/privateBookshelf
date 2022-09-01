@@ -5,14 +5,11 @@ services:
 
     build:
       context: ./
-      dockerfile: Dockerfile
-#    image: java-runtime:${BUILD_VERSION}
-#    container_name: java-runtime
-
+      dockerfile: Dockerfile.x86
     depends_on:
       - postgres
     restart: always
-    working_dir: /runtime
+    working_dir: /source
 
     environment:
       - SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL}
@@ -29,15 +26,27 @@ services:
       - VAADIN_SERVLET_CLOSEIDLESESSIONS=${VAADIN_SERVLET_CLOSEIDLESESSIONS}
       - VAADIN_PRODUCTIONMODE=${VAADIN_PRODUCTIONMODE}
     volumes:
-#      - ./:/source
+      - ./:/source
       - ${STORAGE}:/storage
     ports:
       - 8080:8080
-      - 9090:9090
-    command: java -jar book-shelf.jar
-
-
-
+    command:
+      - /bin/bash
+      - -c
+      - |
+        mkdir /tmp/runtime
+        rm -rf node_modules
+        rm -rf frontend
+        chmod -R 777 /tmp/runtime
+        ./gradlew clean
+        ./gradlew vaadinClean
+        ./gradlew vaadinBuildFrontend
+        ./gradlew bootJar
+        cp build/libs/book-shelf.jar /tmp/runtime
+        chmod -R 777 /tmp/runtime
+        java -jar  /tmp/runtime/book-shelf.jar
+  
+  
 
   postgres:
     image: postgres:14
@@ -59,13 +68,15 @@ services:
 
 
   db_init:
-    image: alpine
+    build:
+      context: ./
+      dockerfile: Dockerfile.x86
     working_dir: /liquibase/db
     depends_on:
       - postgres
     volumes:
       - ./src/main/resources/db/:/liquibase/db
-    command: sh /liquibase/db/updateDockerDb.sh  ${SPRING_DATASOURCE_URL}  ${SPRING_DATASOURCE_USERNAME}  ${SPRING_DATASOURCE_PASSWORD}
+    command: bash /liquibase/db/updateDockerDb.sh  ${SPRING_DATASOURCE_URL}  ${SPRING_DATASOURCE_USERNAME}  ${SPRING_DATASOURCE_PASSWORD}
 
 
 volumes:

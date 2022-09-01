@@ -6,11 +6,10 @@ services:
     build:
       context: ./
       dockerfile: Dockerfile
-
     depends_on:
       - postgres
     restart: always
-    working_dir: /source
+    working_dir: /runtime
 
     environment:
       - SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL}
@@ -27,27 +26,14 @@ services:
       - VAADIN_SERVLET_CLOSEIDLESESSIONS=${VAADIN_SERVLET_CLOSEIDLESESSIONS}
       - VAADIN_PRODUCTIONMODE=${VAADIN_PRODUCTIONMODE}
     volumes:
-      - ./:/source
       - ${STORAGE}:/storage
     ports:
       - 8080:8080
-    command:
-      - /bin/bash
-      - -c
-      - |
-        mkdir /tmp/runtime
-        rm -rf node_modules
-        rm -rf frontend
-        chmod -R 777 /tmp/runtime
-        ./gradlew clean
-        ./gradlew vaadinClean
-        ./gradlew vaadinBuildFrontend
-        ./gradlew bootJar
-        cp build/libs/book-shelf.jar /tmp/runtime
-        chmod -R 777 /tmp/runtime
-        java -jar  /tmp/runtime/book-shelf.jar
-  
-  
+      - 9090:9090
+    command: java -jar book-shelf.jar
+
+
+
 
   postgres:
     image: postgres:14

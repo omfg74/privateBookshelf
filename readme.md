@@ -24,8 +24,9 @@
 
 #### 2.2 build and run
 
-- run deploy.sh from command line.
+- run deploy_x86.sh from command line.
 - that`s all.
+- or if you got any troubles with container build you can run deploy_arm.sh it works on any platform.
 
 #### 2.3 Database
 
