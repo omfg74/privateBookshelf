@@ -29,5 +29,29 @@
 
 #### 2.3 Database
 
-- Deployment database may conflict with developing one. Change database settings in docker-compose.run.yaml or docker-compose.yaml if you need to run them both.
-- Do not forget to change application db settings if you decided to do it  
+- Deployment database may conflict with developing one. Change database settings in docker-compose.run.yaml or
+  docker-compose.yaml if you need to run them both.
+- Do not forget to change application db settings if you decided to do it
+
+### 3. Linux service
+
+If you do not want to use docker you can run deploy as linux service
+
+#### 3.1 Create linux service
+
+Simply run ```sudo bash deploy/linux_service/install_service.sh```
+
+Then configure /opt/bookshelf/app.config
+
+Then run ```sudo systemctl start bookshelf```
+
+profit!
+
+#### 3.2 Remove linux service
+
+run  ```sudo bash deploy/linux_service/remove_linux_service.sh```
+
+#### 3.3 Rebuild app
+
+run  ```sudo bash deploy/linux_service/create_jar.sh```
+and new jar file will replace existing in /opt/bookshelf then run Then run ```sudo systemctl restart bookshelf``` to restart new jar file

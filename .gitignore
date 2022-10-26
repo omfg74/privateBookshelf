@@ -47,4 +47,5 @@ src/main/resources/tmp/storage/bookshelf
 /package-lock.json
 /frontend/
 /lib/
-/.env
+/deploy/docker_service/.env
+/deploy/docker_service/.env

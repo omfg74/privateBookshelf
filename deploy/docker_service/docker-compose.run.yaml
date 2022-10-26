@@ -4,7 +4,7 @@ services:
   java-runtime:
 
     build:
-      context: ./
+      context: $PWD
       dockerfile: Dockerfile
 
     depends_on:
@@ -27,7 +27,7 @@ services:
       - VAADIN_SERVLET_CLOSEIDLESESSIONS=${VAADIN_SERVLET_CLOSEIDLESESSIONS}
       - VAADIN_PRODUCTIONMODE=${VAADIN_PRODUCTIONMODE}
     volumes:
-      - ./:/source
+      - ../../:/source
       - ${STORAGE}:/storage
     ports:
       - 8080:8080
@@ -69,12 +69,11 @@ services:
 
   db_init:
     build:
-      context: ./
+      context: $PWD
       dockerfile: Dockerfile
     working_dir: /liquibase/db
     depends_on:
-      postgres:
-        condition: service_started
+      - postgres
     volumes:
       - ./src/main/resources/db/:/liquibase/db
     command: bash /liquibase/db/updateDockerDb.sh  ${SPRING_DATASOURCE_URL}  ${SPRING_DATASOURCE_USERNAME}  ${SPRING_DATASOURCE_PASSWORD}
