@@ -77,22 +77,15 @@ public class BookService {
             book.getFiles().addAll(bookFileServise.findAllByBookId(book.getId()));
         }
 
-//        book.getFiles().forEach(bookFile -> {
-//            if (bookFile.getId() != null) {
-//                var entity = entityManager.getReference(BookFileEntity.class, bookFile.getId());
-//                bookFile.setId(entity.getId());
-//                bookFile.setName(entity.getName());
-//                bookFile.setFileExtension(entity.getFileExtension());
-//            }
-//        });
-
         return mapper.map(bookRepository.saveAndFlush(mapper.map(book)));
     }
 
 
     private Specification<BookEntity> getWhereClose(BookFilter filter) {
 
-        return Domain.<BookEntity>byString(BookEntity.Fields.name, filter.getText());
+        return Domain.<BookEntity>byString(BookEntity.Fields.name, filter.getText())
+                .or(Domain.<BookEntity, AuthorEntity>byStringJoin(BookEntity.Fields.author, AuthorEntity.Fields.lastName, filter.getText()))
+                .or(Domain.<BookEntity, GenreEntity>byStringJoin(BookEntity.Fields.genres, GenreEntity.Fields.name, filter.getText()));
     }
 
     private List<Book> pageProcessor(Page<BookEntity> list) {
@@ -118,6 +111,7 @@ public class BookService {
     public void deleteBooks(List<Book> bookList) {
         bookRepository.deleteAll(bookList.stream().map(mapper::map).toList());
     }
+
     public void delete(Book book) {
         bookRepository.delete(mapper.map(book));
     }
