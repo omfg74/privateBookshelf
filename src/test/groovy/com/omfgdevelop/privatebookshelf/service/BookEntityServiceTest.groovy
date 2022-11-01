@@ -32,7 +32,7 @@ class BookEntityServiceTest extends RepositorySpecBase {
         then:
         book.id == 100
         book.name == "Lru"
-        book.author.stream().toList().get(0).id == 10L
+        book.author.stream().toList().get(0).id == 11L
     }
 
     @Transactional
@@ -161,6 +161,78 @@ class BookEntityServiceTest extends RepositorySpecBase {
         page.getContent().stream().toList().get(0).getAuthor().stream().toList().get(0).getId() == 10
         page.getContent().get(0).getName() == "Tom Soyer"
         page.getContent().get(0).getId() == 101
+    }
+
+    def 'can find book by author'() {
+        given:
+        def filter = BookFilter.builder()
+                .text("test_last").build()
+        def request = FilteredQueryWithPagingRequest<BookFilter>.builder()
+                .filter(filter)
+                .pageNumber(10)
+                .pageNumber(0)
+                .build()
+
+        when:
+        Page page = bookService.findPage(request);
+
+
+        then:
+
+        page != null
+
+        page.getTotalElements() == 2
+
+    }
+
+    def 'can find book by author'() {
+        given:
+        def filter = BookFilter.builder()
+                .text("test_last2").build()
+        def request = FilteredQueryWithPagingRequest<BookFilter>.builder()
+                .filter(filter)
+                .pageNumber(10)
+                .pageNumber(0)
+                .build()
+
+        when:
+        Page page = bookService.findPage(request);
+
+
+        then:
+
+        page != null
+
+        page.getTotalElements() == 1
+        page.getContent().stream().toList().get(0).getAuthor().stream().toList().get(0).getId() == 11
+        page.getContent().get(0).getName() == "Lru"
+        page.getContent().get(0).getId() == 100
+
+    }
+
+    def 'can find book by genre'() {
+        given:
+        def filter = BookFilter.builder()
+                .text("Fiction").build()
+        def request = FilteredQueryWithPagingRequest<BookFilter>.builder()
+                .filter(filter)
+                .pageNumber(10)
+                .pageNumber(0)
+                .build()
+
+        when:
+        Page page = bookService.findPage(request);
+
+
+        then:
+
+        page != null
+
+        page.getTotalElements() == 1
+        page.getContent().stream().toList().get(0).getAuthor().stream().toList().get(0).getId() == 10
+        page.getContent().get(0).getName() == "Tom Soyer"
+        page.getContent().get(0).getId() == 101
+
     }
 
 
