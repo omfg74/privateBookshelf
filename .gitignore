@@ -49,3 +49,4 @@ src/main/resources/tmp/storage/bookshelf
 /lib/
 /deploy/docker_service/.env
 /deploy/docker_service/.env
+/logs/
