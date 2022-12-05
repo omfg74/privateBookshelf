@@ -14,6 +14,10 @@ sourceCompatibility = '17'
 configurations {
     compileOnly {
         extendsFrom annotationProcessor
+
+    }
+    all {
+        exclude module: 'spring-boot-starter-logging'
     }
 }
 
@@ -39,12 +43,17 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-log4j2'
+    implementation 'org.apache.logging.log4j:log4j-web:2.19.0'
+    implementation 'org.apache.logging.log4j:log4j-core:2.19.0'
+    implementation 'org.apache.logging.log4j:log4j-api:2.19.0'
+    implementation 'org.apache.logging.log4j:log4j-jul:2.19.0'
+    implementation 'org.apache.logging.log4j:log4j-slf4j-impl:2.19.0'
+
     implementation 'com.vaadin:vaadin-spring-boot-starter:23.1.6'
     implementation 'org.vaadin.gatanaso:multiselect-combo-box-flow:4.0.0-rc2'
     implementation 'com.vaadin:vaadin-confirm-dialog-flow:23.1.6'
     implementation 'com.vaadin:flow-server-production-mode:23.1.6'
-
-
 
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'org.postgresql:postgresql'

@@ -32,6 +32,7 @@ import com.vaadin.flow.data.provider.CallbackDataProvider;
 import com.vaadin.flow.data.provider.ConfigurableFilterDataProvider;
 import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.data.selection.MultiSelectionListener;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.vaadin.gatanaso.MultiselectComboBox;
 
@@ -43,6 +44,7 @@ import java.util.stream.Collectors;
 import static com.omfgdevelop.privatebookshelf.exception.ValidationError.*;
 import static com.omfgdevelop.privatebookshelf.utils.Validator.*;
 
+@Log4j2
 public class UploadDialog extends Dialog {
     private final AuthorService authorService;
     private final GenreService genreService;
@@ -118,12 +120,14 @@ public class UploadDialog extends Dialog {
             bookFile = fileProcessingService.createBookFile(fileData, fileName, mimeType, contentLength);
         } catch (IOException e) {
             ComponentProvider.getErrorNotification("Unexpected Error");
+            log.error(()->"Upload error",e);
             throw new RuntimeException(e);
         } finally {
             try {
                 fileData.close();
             } catch (IOException e) {
                 ComponentProvider.getErrorNotification("Unexpected Error");
+                log.error(()->"Upload error",e);
                 throw new RuntimeException(e);
             }
         }
@@ -140,15 +144,18 @@ public class UploadDialog extends Dialog {
 
         if (errors.contains(BOOK_NAME_IS_NOT_SET)) {
             bookName.setInvalid(true);
+            log.info(() -> "Enter book name");
             bookName.setErrorMessage("Enter book name");
         }
 
         if (errors.contains(AUTHOR_IS_NOT_SET)) {
             authorComboBox.setInvalid(true);
+            log.info(()->"Select author from the list");
             authorComboBox.setErrorMessage("Select author from the list");
         }
         if (errors.contains(GENRE_IS_NOT_SET)) {
             genreComboBox.setInvalid(true);
+            log.info(()->"Select genre from the list");
             genreComboBox.setErrorMessage("Select genre from the list");
         }
 
@@ -168,11 +175,14 @@ public class UploadDialog extends Dialog {
             }
         } catch (org.springframework.dao.DataIntegrityViolationException e) {
             ComponentProvider.getErrorNotification("Book already exists");
+            log.error(()->"Upload error",e);
             throw new RuntimeException(e);
         } catch (BusinessException e) {
             ComponentProvider.getErrorNotification(e.getMessage());
+            log.error(()->"Upload error",e);
             throw new RuntimeException(e);
         } catch (Exception e) {
+            log.error(()->"Upload error",e);
             ComponentProvider.getErrorNotification("Unexpected Error");
             throw new RuntimeException(e);
         }
